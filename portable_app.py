@@ -102,11 +102,7 @@ def launch_native_window():
                     "--no-first-run",
                     "--no-default-browser-check"
                 ]
-                proc = subprocess.Popen(cmd)
-                
-                # Wait until the user closes the desktop window, then exit backend cleanly
-                proc.wait()
-                os._exit(0)
+                subprocess.Popen(cmd)
                 return
             except Exception:
                 continue

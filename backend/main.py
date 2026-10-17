@@ -365,6 +365,19 @@ def request_admin_elevation():
         "message": "Solicitud UAC enviada. Si aceptaste el diálogo de Windows, Optima se iniciará como Administrador."
     }
 
+@app.post("/api/system/shutdown")
+def shutdown_system():
+    """
+    Gracefully shuts down OptimaAI when the desktop window is closed.
+    """
+    import threading, time
+    def _delayed_exit():
+        time.sleep(0.4)
+        import os
+        os._exit(0)
+    threading.Thread(target=_delayed_exit, daemon=True).start()
+    return {"status": "shutting_down"}
+
 # Mount static build if available (supports both source dev and PyInstaller frozen bundle)
 if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
     base_dir = Path(sys._MEIPASS)

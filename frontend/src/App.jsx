@@ -176,7 +176,19 @@ export default function App() {
       fetchOllamaStatus();
       fetchGameDetectorStatus();
     }, 3500);
-    return () => clearInterval(interval);
+
+    // Notify backend to cleanly shutdown when window is closed
+    const handleUnload = () => {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/system/shutdown');
+      }
+    };
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('beforeunload', handleUnload);
+    };
   }, [fetchStatus, fetchModels, fetchOllamaStatus, fetchLogs, fetchLicenseStatus, fetchGameDetectorStatus]);
 
   const handleLaunchOllama = async () => {

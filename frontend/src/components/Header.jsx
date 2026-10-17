@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, ShieldAlert, Cpu, Sparkles, RefreshCw } from 'lucide-react';
+import { Shield, ShieldAlert, Cpu, Sparkles, RefreshCw, Crown } from 'lucide-react';
 
 export default function Header({
   systemStatus,
@@ -9,7 +9,9 @@ export default function Header({
   onRelaunchAdmin,
   refreshing,
   onRefresh,
-  ollamaStatus
+  ollamaStatus,
+  licenseStatus,
+  onOpenProModal
 }) {
   return (
     <header className="glass-panel-header px-6 py-4 sticky top-0 z-50">
@@ -77,6 +79,27 @@ export default function Header({
             >
               <ShieldAlert className="h-3.5 w-3.5" />
               <span>Usuario Estándar (Elevar)</span>
+            </button>
+          )}
+
+          {/* Pro Edition Badge / Action */}
+          {licenseStatus?.is_pro ? (
+            <button
+              onClick={onOpenProModal}
+              title={`OptimaAI Pro activo - Titular: ${licenseStatus.holder} (${licenseStatus.tier?.toUpperCase()})`}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500/20 via-yellow-400/20 to-purple-500/20 text-amber-300 border border-amber-400/40 shadow-sm shadow-amber-500/10 hover:border-amber-300 hover:scale-105 transition-all"
+            >
+              <Crown className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400/20" />
+              <span>PRO ({licenseStatus.holder})</span>
+            </button>
+          ) : (
+            <button
+              onClick={onOpenProModal}
+              title="Haz clic para activar o ingresar tu clave Pro"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 shadow-md shadow-amber-500/20 hover:scale-105 transition-all"
+            >
+              <Crown className="h-3.5 w-3.5 text-slate-950 fill-slate-950/20" />
+              <span>Activar PRO</span>
             </button>
           )}
 

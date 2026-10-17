@@ -22,6 +22,7 @@ from backend.core.telemetry import telemetry_collector, SystemSnapshot
 from backend.core.ollama_client import ollama_engine, DiagnosticResponse
 from backend.core.ollama_manager import ollama_manager
 from backend.core.executor import action_executor, BatchExecutionSummary, ActionResult
+from backend.core.license_manager import license_manager, LicenseStatus
 
 app = FastAPI(
     title=settings.app_name,
@@ -53,6 +54,9 @@ class BatchActionRequest(BaseModel):
 class ConfigureModelRequest(BaseModel):
     model: str
 
+class ActivateLicenseRequest(BaseModel):
+    key: str
+
 # Audit log storage
 _execution_logs: List[Dict[str, Any]] = []
 
@@ -83,13 +87,41 @@ def clear_activity_logs():
     _execution_logs = []
     return {"cleared": True}
 
+@app.get("/api/license/status")
+def get_license_status():
+    """
+    Returns current license status (Pro vs Free), holder name, and tier.
+    """
+    return license_manager.get_status().model_dump()
+
+@app.post("/api/license/activate")
+def activate_pro_license(req: ActivateLicenseRequest):
+    """
+    Validates cryptographic signature and activates Pro license locally.
+    """
+    success, status = license_manager.activate(req.key)
+    if not success:
+        raise HTTPException(status_code=400, detail=status.message)
+    return status.model_dump()
+
+@app.post("/api/license/deactivate")
+def deactivate_pro_license():
+    """
+    Removes Pro license and reverts to Community edition.
+    """
+    license_manager.deactivate()
+    return license_manager.get_status().model_dump()
+
 @app.get("/api/health")
 def get_health():
+    lic = license_manager.get_status()
     return {
         "status": "healthy",
         "app": settings.app_name,
         "version": settings.version,
         "is_admin": security_manager.is_elevated(),
+        "is_pro": lic.is_pro,
+        "license_holder": lic.holder,
         "ollama_url": settings.ollama.base_url,
         "active_model": ollama_engine.model
     }

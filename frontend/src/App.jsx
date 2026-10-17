@@ -6,6 +6,7 @@ import ActionList from './components/ActionList';
 import CandidateTable from './components/CandidateTable';
 import ActivityLogPanel from './components/ActivityLogPanel';
 import OllamaStatusBanner from './components/OllamaStatusBanner';
+import ProActivationModal from './components/ProActivationModal';
 import { Play, Zap, RefreshCw, AlertCircle, CheckCircle2, Rocket } from 'lucide-react';
 
 export default function App() {
@@ -17,6 +18,8 @@ export default function App() {
   const [logs, setLogs] = useState([]);
   const [latestTrimSummary, setLatestTrimSummary] = useState(null);
   const [ollamaStatus, setOllamaStatus] = useState(null);
+  const [licenseStatus, setLicenseStatus] = useState(null);
+  const [isProModalOpen, setIsProModalOpen] = useState(false);
   
   const [refreshing, setRefreshing] = useState(false);
   const [scanning, setScanning] = useState(false);
@@ -90,17 +93,31 @@ export default function App() {
     }
   }, []);
 
+  // 4. Fetch Pro license status
+  const fetchLicenseStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/license/status');
+      if (res.ok) {
+        const data = await res.json();
+        setLicenseStatus(data);
+      }
+    } catch (e) {
+      console.warn("Error fetching license status:", e);
+    }
+  }, []);
+
   useEffect(() => {
     fetchStatus();
     fetchModels();
     fetchOllamaStatus();
     fetchLogs();
+    fetchLicenseStatus();
     const interval = setInterval(() => {
       fetchStatus();
       fetchOllamaStatus();
     }, 3500);
     return () => clearInterval(interval);
-  }, [fetchStatus, fetchModels, fetchOllamaStatus, fetchLogs]);
+  }, [fetchStatus, fetchModels, fetchOllamaStatus, fetchLogs, fetchLicenseStatus]);
 
   const handleLaunchOllama = async () => {
     setLaunchingOllama(true);
@@ -262,10 +279,13 @@ export default function App() {
         onRelaunchAdmin={handleRelaunchAdmin}
         refreshing={refreshing}
         ollamaStatus={ollamaStatus}
+        licenseStatus={licenseStatus}
+        onOpenProModal={() => setIsProModalOpen(true)}
         onRefresh={async () => {
           setRefreshing(true);
           await fetchStatus();
           await fetchOllamaStatus();
+          await fetchLicenseStatus();
           setRefreshing(false);
         }}
       />
@@ -380,8 +400,23 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800/60 py-4 px-6 text-center text-xs text-slate-400">
-        Optima AI System Optimizer • Powered by Ollama Local LLMs • Safe List Enforced
+        OptimaAI System Optimizer • Powered by Ollama Local LLMs • Safe List Enforced
       </footer>
+
+      {/* Pro Activation & Patreon Modal */}
+      <ProActivationModal
+        isOpen={isProModalOpen}
+        onClose={() => setIsProModalOpen(false)}
+        licenseStatus={licenseStatus}
+        onActivateSuccess={(status) => {
+          setLicenseStatus(status);
+          showToast(`¡OptimaAI Pro Activado para ${status.holder}! 👑`, 'success');
+        }}
+        onDeactivateSuccess={(status) => {
+          setLicenseStatus(status);
+          showToast("Licencia Pro desactivada.", 'info');
+        }}
+      />
 
     </div>
   );

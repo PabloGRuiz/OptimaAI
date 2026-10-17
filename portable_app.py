@@ -62,6 +62,23 @@ CANDIDATE_BROWSERS = [
     r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe",
 ]
 
+def kill_previous_instances():
+    """Terminates any previous hung instances of OptimaAI to free port 8765 cleanly."""
+    if not sys.platform.startswith("win"):
+        return
+    current_pid = os.getpid()
+    try:
+        import psutil
+        for p in psutil.process_iter(['pid', 'name']):
+            try:
+                if p.info['pid'] != current_pid and p.info['name']:
+                    if p.info['name'].lower() in ['optimaai.exe', 'optima.exe']:
+                        p.kill()
+            except Exception:
+                pass
+    except Exception:
+        pass
+
 def get_browser_profile_dir() -> Path:
     """Returns dedicated profile directory for OptimaAI app window."""
     base = os.environ.get("LOCALAPPDATA") or os.environ.get("TEMP") or "."
@@ -150,6 +167,9 @@ def spawn_app_window(url: str = "http://127.0.0.1:8765"):
         if found and found not in candidates:
             candidates.append(found)
 
+    # 0x08000000 = CREATE_NO_WINDOW (prevents any console flashing)
+    creation_flags = 0x08000000 if sys.platform.startswith("win") else 0
+
     # Attempt to open as dedicated App window
     for browser_path in candidates:
         if Path(browser_path).exists():
@@ -166,22 +186,11 @@ def spawn_app_window(url: str = "http://127.0.0.1:8765"):
                     "--disable-extensions",
                     "--disable-sync"
                 ]
-                proc = subprocess.Popen(cmd)
-                time.sleep(1.2)
+                proc = subprocess.Popen(cmd, creationflags=creation_flags)
+                time.sleep(1.0)
                 
-                # Check if process survived launch
+                # If the process did not exit immediately with an error, it succeeded!
                 if proc.poll() is None:
-                    # Successfully running! Monitor window closing in a thread
-                    def _watch_window():
-                        start_time = time.time()
-                        proc.wait()
-                        # Only exit if the process was running for at least 3 seconds
-                        if time.time() - start_time > 3.0:
-                            time.sleep(0.3)
-                            clean_stale_browser_locks(profile_dir)
-                            os._exit(0)
-                        
-                    threading.Thread(target=_watch_window, daemon=True).start()
                     return True
             except Exception:
                 continue
@@ -200,19 +209,16 @@ def launch_window_worker():
         show_error_dialog(
             "OptimaAI - Error de Inicialización",
             "El servidor interno de OptimaAI no pudo responder en el puerto 8765.\n"
-            "Verifica que el puerto no esté ocupado por otra aplicación."
+            "Verifica que el puerto no esté bloqueado."
         )
 
 def main():
-    url = "http://127.0.0.1:8765"
-    
-    # 1. If an instance is ALREADY running on port 8765, just bring up window and exit!
-    if is_server_ready(url):
-        spawn_app_window(url)
-        return
+    # 1. Kill any hung previous instances to ensure port 8765 is pristine
+    kill_previous_instances()
+    time.sleep(0.15)
 
     try:
-        # 2. Launch window in parallel once server answers health check
+        # 2. Launch window worker once server is responsive
         threading.Thread(target=launch_window_worker, daemon=True).start()
         
         # 3. Start web server serving both API and compiled React frontend

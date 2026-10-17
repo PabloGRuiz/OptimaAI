@@ -2,6 +2,7 @@
 OptimaAI - In-Game Topmost Click-Through Gaming Overlay (PRO)
 Displays real-time FPS, CPU, GPU, VRAM, and RAM metrics over active full-screen games.
 Uses Win32 WS_EX_TRANSPARENT to guarantee zero interference with gameplay or mouse clicks.
+Uses the Persistent Daemon Window pattern (withdraw/deiconify) for 100% thread safety.
 """
 
 from __future__ import annotations
@@ -23,6 +24,7 @@ class InGameOverlay:
     def __init__(self):
         self.is_active: bool = False
         self.position: str = "top-right"  # "top-right" or "top-left"
+        self._visible: bool = False
         self._root: Optional[tk.Tk] = None
         self._thread: Optional[threading.Thread] = None
         self._lock = threading.Lock()
@@ -34,38 +36,31 @@ class InGameOverlay:
         self._lbl_ram: Optional[tk.Label] = None
         self._lbl_game: Optional[tk.Label] = None
 
+        # Start persistent daemon window thread
+        self._start_daemon_thread()
+
+    def _start_daemon_thread(self):
+        """Initializes persistent Tkinter daemon thread on startup."""
+        self._thread = threading.Thread(target=self._run_gui, daemon=True, name="InGameOverlayDaemon")
+        self._thread.start()
+
     def start_overlay(self, position: str = "top-right") -> bool:
-        """Launches in-game overlay in a dedicated thread."""
+        """Shows the in-game overlay."""
         with self._lock:
-            if self.is_active:
-                return True
             self.position = position
             self.is_active = True
-            self._thread = threading.Thread(target=self._run_gui, daemon=True, name="InGameOverlayThread")
-            self._thread.start()
             return True
 
     def stop_overlay(self) -> bool:
-        """Closes and destroys in-game overlay."""
+        """Hides the in-game overlay without destroying Tkinter context."""
         with self._lock:
-            if not self.is_active:
-                return False
             self.is_active = False
-            if self._root:
-                try:
-                    self._root.after(0, self._root.destroy)
-                except Exception:
-                    pass
-                self._root = None
             return True
 
     def toggle(self) -> bool:
-        if self.is_active:
-            self.stop_overlay()
-            return False
-        else:
-            self.start_overlay()
-            return True
+        with self._lock:
+            self.is_active = not self.is_active
+            return self.is_active
 
     def _apply_click_through(self, root: tk.Tk):
         """Applies Win32 Click-Through and Toolwindow styles so mouse clicks pass through."""
@@ -82,90 +77,121 @@ class InGameOverlay:
         except Exception:
             pass
 
-    def _run_gui(self):
-        root = tk.Tk()
-        self._root = root
-        root.title("OptimaAI In-Game HUD")
-        root.overrideredirect(True)
-        root.wm_attributes("-topmost", True)
-        root.wm_attributes("-alpha", 0.90)
-
-        # Calculate positioning
-        screen_width = root.winfo_screenwidth()
-        overlay_width = 440
-        overlay_height = 54
-        
-        if self.position == "top-left":
-            x = 30
-            y = 20
-        else:  # top-right
-            x = max(screen_width - overlay_width - 30, 20)
-            y = 20
-
-        root.geometry(f"{overlay_width}x{overlay_height}+{x}+{y}")
-        root.configure(bg="#090D16")
-
-        # Container Frame
-        main_frame = tk.Frame(root, bg="#0F172A", bd=1, relief="solid", highlightbackground="#3B82F6", highlightthickness=1)
-        main_frame.pack(fill="both", expand=True)
-
-        # Top row: Game Title & Pro Badge
-        top_row = tk.Frame(main_frame, bg="#0F172A")
-        top_row.pack(fill="x", padx=8, pady=(4, 2))
-
-        self._lbl_game = tk.Label(
-            top_row,
-            text="🎮 OptimaAI Centinela Activo",
-            fg="#93C5FD",
-            bg="#0F172A",
-            font=("Segoe UI", 9, "bold")
-        )
-        self._lbl_game.pack(side="left")
-
-        lbl_pro = tk.Label(
-            top_row,
-            text="PRO AUTO-BOOST",
-            fg="#F59E0B",
-            bg="#0F172A",
-            font=("Segoe UI", 8, "bold")
-        )
-        lbl_pro.pack(side="right")
-
-        # Metrics Row
-        metrics_row = tk.Frame(main_frame, bg="#0F172A")
-        metrics_row.pack(fill="x", padx=8, pady=(0, 4))
-
-        self._lbl_fps = tk.Label(metrics_row, text="FPS: 165", fg="#10B981", bg="#0F172A", font=("Consolas", 11, "bold"))
-        self._lbl_fps.pack(side="left", padx=(0, 10))
-
-        self._lbl_gpu = tk.Label(metrics_row, text="GPU: 0%", fg="#38BDF8", bg="#0F172A", font=("Consolas", 10, "bold"))
-        self._lbl_gpu.pack(side="left", padx=(0, 10))
-
-        self._lbl_cpu = tk.Label(metrics_row, text="CPU: 0%", fg="#F43F5E", bg="#0F172A", font=("Consolas", 10, "bold"))
-        self._lbl_cpu.pack(side="left", padx=(0, 10))
-
-        self._lbl_ram = tk.Label(metrics_row, text="VRAM: 0GB", fg="#A855F7", bg="#0F172A", font=("Consolas", 10, "bold"))
-        self._lbl_ram.pack(side="left")
-
-        # Apply Click-Through after window maps
-        root.update_idletasks()
-        self._apply_click_through(root)
-
-        # Start live updater callback
-        self._update_overlay_data()
-
+    def _reposition(self, root: tk.Tk):
+        """Calculates geometry based on position setting and screen resolution."""
         try:
+            screen_width = root.winfo_screenwidth()
+            overlay_width = 440
+            overlay_height = 54
+            
+            if self.position == "top-left":
+                x = 30
+                y = 20
+            else:  # top-right
+                x = max(screen_width - overlay_width - 30, 20)
+                y = 20
+
+            root.geometry(f"{overlay_width}x{overlay_height}+{x}+{y}")
+        except Exception:
+            pass
+
+    def _run_gui(self):
+        """Runs the persistent Tk mainloop in this dedicated thread."""
+        try:
+            root = tk.Tk()
+            self._root = root
+            root.title("OptimaAI In-Game HUD")
+            root.overrideredirect(True)
+            root.wm_attributes("-topmost", True)
+            root.wm_attributes("-alpha", 0.90)
+
+            self._reposition(root)
+            root.configure(bg="#090D16")
+
+            # Container Frame
+            main_frame = tk.Frame(root, bg="#0F172A", bd=1, relief="solid", highlightbackground="#3B82F6", highlightthickness=1)
+            main_frame.pack(fill="both", expand=True)
+
+            # Top row: Game Title & Pro Badge
+            top_row = tk.Frame(main_frame, bg="#0F172A")
+            top_row.pack(fill="x", padx=8, pady=(4, 2))
+
+            self._lbl_game = tk.Label(
+                top_row,
+                text="🎮 OptimaAI Centinela Activo",
+                fg="#93C5FD",
+                bg="#0F172A",
+                font=("Segoe UI", 9, "bold")
+            )
+            self._lbl_game.pack(side="left")
+
+            lbl_pro = tk.Label(
+                top_row,
+                text="PRO AUTO-BOOST",
+                fg="#F59E0B",
+                bg="#0F172A",
+                font=("Segoe UI", 8, "bold")
+            )
+            lbl_pro.pack(side="right")
+
+            # Metrics Row
+            metrics_row = tk.Frame(main_frame, bg="#0F172A")
+            metrics_row.pack(fill="x", padx=8, pady=(0, 4))
+
+            self._lbl_fps = tk.Label(metrics_row, text="FPS: 165", fg="#10B981", bg="#0F172A", font=("Consolas", 11, "bold"))
+            self._lbl_fps.pack(side="left", padx=(0, 10))
+
+            self._lbl_gpu = tk.Label(metrics_row, text="GPU: 0%", fg="#38BDF8", bg="#0F172A", font=("Consolas", 10, "bold"))
+            self._lbl_gpu.pack(side="left", padx=(0, 10))
+
+            self._lbl_cpu = tk.Label(metrics_row, text="CPU: 0%", fg="#F43F5E", bg="#0F172A", font=("Consolas", 10, "bold"))
+            self._lbl_cpu.pack(side="left", padx=(0, 10))
+
+            self._lbl_ram = tk.Label(metrics_row, text="VRAM: 0GB", fg="#A855F7", bg="#0F172A", font=("Consolas", 10, "bold"))
+            self._lbl_ram.pack(side="left")
+
+            # Apply Click-Through after window maps
+            root.update_idletasks()
+            self._apply_click_through(root)
+
+            # Start hidden by default
+            root.withdraw()
+            self._visible = False
+
+            # Start unified tick loop
+            self._tick_loop()
             root.mainloop()
         except Exception:
             pass
-        finally:
-            self.is_active = False
-            self._root = None
 
-    def _update_overlay_data(self):
-        if not self.is_active or not self._root:
+    def _tick_loop(self):
+        """Unified 250ms update and visibility loop."""
+        if not self._root:
             return
 
+        try:
+            # 1. Manage visibility cleanly inside this thread
+            if self.is_active and not self._visible:
+                self._reposition(self._root)
+                self._root.deiconify()
+                self._apply_click_through(self._root)
+                self._visible = True
+            elif not self.is_active and self._visible:
+                self._root.withdraw()
+                self._visible = False
+
+            # 2. If visible, update live metrics
+            if self._visible:
+                self._refresh_labels()
+
+        except Exception:
+            pass
+        finally:
+            if self._root:
+                self._root.after(250, self._tick_loop)
+
+    def _refresh_labels(self):
+        """Updates text labels with latest hardware telemetry."""
         try:
             from backend.core.gpu_telemetry import gpu_telemetry
             from backend.core.game_detector import game_detector
@@ -195,10 +221,6 @@ class InGameOverlay:
                     self._lbl_game.configure(text=f"🎮 {active.name[:22]}")
                 else:
                     self._lbl_game.configure(text="🎮 OptimaAI Centinela")
-
-            # Schedule next update in 500ms
-            if self._root:
-                self._root.after(500, self._update_overlay_data)
         except Exception:
             pass
 

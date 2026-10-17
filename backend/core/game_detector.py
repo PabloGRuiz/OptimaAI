@@ -226,15 +226,17 @@ class SmartGameDetector:
         if not sys.platform.startswith("win"):
             return
         restored = 0
-        for pid in list(self._throttled_pids):
+        pids = list(self._throttled_pids)
+        self._throttled_pids = []
+        for pid in pids:
             try:
-                p = psutil.Process(pid)
-                if p.is_running():
-                    p.nice(psutil.NORMAL_PRIORITY_CLASS)
-                    restored += 1
+                if psutil.pid_exists(pid):
+                    p = psutil.Process(pid)
+                    if p.is_running():
+                        p.nice(psutil.NORMAL_PRIORITY_CLASS)
+                        restored += 1
             except Exception:
                 pass
-        self._throttled_pids = []
         return restored
 
     def _on_game_started(self, game: DetectedGame):

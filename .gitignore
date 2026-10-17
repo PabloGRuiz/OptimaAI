@@ -52,4 +52,5 @@ Thumbs.db
 
 # Admin Tools (Strictly Private)
 admin_keygen/
+tools/*.exe
 *.log

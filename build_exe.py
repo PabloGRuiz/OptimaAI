@@ -66,6 +66,11 @@ def build_executable():
         str(ROOT_DIR / "portable_app.py")
     ]
 
+    icon_file = ROOT_DIR / "OptimaAI.ico"
+    if icon_file.exists():
+        print(f"[*] Icono detectado: {icon_file.name}")
+        cmd.insert(6, f"--icon={icon_file}")
+
     print("[*] Ejecutando comando de compilación:")
     print("    " + " ".join(cmd[:8]) + " ...")
     subprocess.check_call(cmd, cwd=str(ROOT_DIR))

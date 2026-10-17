@@ -296,6 +296,7 @@ class SystemActionExecutor:
         import datetime
         now_str = datetime.datetime.now().strftime("%H:%M:%S")
 
+        summary = BatchExecutionSummary(total_requested=len(action_requests))
         summary.technical_explanation = (
             "Acciones de optimización auditadas por Optima Safe List. Cada terminación validó previamente que el proceso "
             "no sea parte del kernel del sistema operativo (PID 0, 4), servicios críticos (svchost, csrss, lsass) "

@@ -36,14 +36,22 @@ def main():
     # 3. Test Memory Working Set Trimming (EmptyWorkingSet)
     print("\n[3/3] Prueba de Optimización de Memoria (EmptyWorkingSet):")
     current_pid = os.getpid()
-    success, freed_mb, msg = action_executor.trim_process_working_set(current_pid)
+    success, freed_mb, b_mb, a_mb, msg = action_executor.trim_process_working_set(current_pid)
     print(f"    Vaciado de memoria en PID {current_pid}: Success={success} | {msg}")
     
     # Global sweep test
-    success_count, total_freed = action_executor.trim_all_user_processes()
+    success_count, total_freed, top_rec, tech_exp = action_executor.trim_all_user_processes()
     print(f"    Barrido global de memoria en procesos de usuario:")
     print(f"    [+] {success_count} procesos optimizados")
     print(f"    [+] {total_freed} MB de memoria física reclamados sin cerrar ninguna aplicación")
+
+    # 4. Test execute_batch_actions
+    print("\n[4/4] Prueba de execute_batch_actions:")
+    batch_req = [{"pid": current_pid, "action": "trim_memory", "reason": "Test trim"}]
+    summary = action_executor.execute_batch_actions(batch_req)
+    print(f"    Batch results: Total requested={summary.total_requested}, succeeded={summary.total_succeeded}")
+    assert summary.total_requested == 1
+    assert len(summary.results) == 1
 
     print("\n" + "=" * 60)
     print("[✓] PASO 4 VALIDADO CON ÉXITO.")

@@ -49,4 +49,7 @@ pnpm-debug.log*
 *.swo
 .DS_Store
 Thumbs.db
+
+# Admin Tools (Strictly Private)
+admin_keygen/
 *.log

@@ -14,7 +14,14 @@ import ctypes
 import threading
 import subprocess
 import webbrowser
+import urllib.request
 from pathlib import Path
+
+# Fix for PyInstaller --noconsole mode where sys.stdout/stderr are None
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w", encoding="utf-8")
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w", encoding="utf-8")
 
 # Setup paths for both standard execution and PyInstaller bundled runtime
 if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
@@ -44,13 +51,27 @@ def show_error_dialog(title: str, message: str):
         except Exception:
             pass
 
+def wait_for_server(url: str, timeout_seconds: float = 8.0) -> bool:
+    """Waits until FastAPI server is fully ready and returning 200 OK."""
+    start = time.time()
+    while time.time() - start < timeout_seconds:
+        try:
+            with urllib.request.urlopen(f"{url}/api/health", timeout=0.4) as resp:
+                if resp.status == 200:
+                    return True
+        except Exception:
+            time.sleep(0.15)
+    return False
+
 def launch_native_window():
     """
     Launches OptimaAI in a dedicated, isolated native desktop window
     with no browser tabs, no address bar, and custom window dimensions.
     """
-    time.sleep(1.2)
     url = "http://127.0.0.1:8765"
+    
+    # Wait until the web server is completely alive before showing the window
+    wait_for_server(url)
     
     candidates = list(CANDIDATE_BROWSERS)
     for name in ["msedge", "chrome", "brave"]:
@@ -95,27 +116,23 @@ def launch_native_window():
 
 def main():
     try:
-        print("=" * 65)
-        print("  OPTIMAAI - AI & HEURISTIC SYSTEM OPTIMIZER")
-        print("  Iniciando ventana de escritorio nativa...")
-        print("=" * 65)
-        print("  Acceso web local: http://127.0.0.1:8765")
-        print("=" * 65)
-        
         # Launch dedicated desktop window on separate thread
         threading.Thread(target=launch_native_window, daemon=True).start()
         
         # Start web server serving both API and compiled React frontend
-        uvicorn.run(app, host="127.0.0.1", port=8765, log_level="warning")
+        # log_config=None prevents 'Unable to configure formatter default' in GUI mode
+        uvicorn.run(
+            app,
+            host="127.0.0.1",
+            port=8765,
+            log_config=None,
+            access_log=False
+        )
     except KeyboardInterrupt:
-        print("\n[*] OptimaAI se cerró correctamente.")
+        pass
     except Exception as e:
         import traceback
         err_msg = traceback.format_exc()
-        print("\n" + "!" * 65)
-        print("  ERROR AL INICIAR OPTIMA")
-        print("!" * 65)
-        print(err_msg)
         show_error_dialog("Error al Iniciar OptimaAI", f"Ocurrió un error al iniciar la aplicación:\n\n{str(e)}")
 
 if __name__ == "__main__":

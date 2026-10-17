@@ -27,9 +27,21 @@ def ensure_frontend_build():
     print("[*] Compilando frontend React para empaquetado...")
     npm_cmd = "npm.cmd" if sys.platform.startswith("win") else "npm"
     subprocess.check_call([npm_cmd, "run", "build"], cwd=str(ROOT_DIR / "frontend"), shell=True)
-    print("[✓] Frontend compilado con éxito.")
+def kill_running_instances():
+    if sys.platform.startswith("win"):
+        try:
+            import psutil
+            for p in psutil.process_iter(['name']):
+                if p.info['name'] and p.info['name'].lower() in ["optimaai.exe", "optima.exe"]:
+                    try:
+                        p.kill()
+                    except Exception:
+                        pass
+        except Exception:
+            pass
 
 def build_executable():
+    kill_running_instances()
     print("\n" + "=" * 60)
     print("  COMPILANDO OPTIMA A EJECUTABLE PORTABLE (.EXE)")
     print("=" * 60)
@@ -47,6 +59,7 @@ def build_executable():
         "--onefile",
         "--clean",
         "--noconfirm",
+        "--noconsole",
         f"--add-data={frontend_data}",
         f"--add-data={backend_data}",
         "--hidden-import=uvicorn",

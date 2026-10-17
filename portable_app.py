@@ -170,7 +170,7 @@ def spawn_app_window(url: str = "http://127.0.0.1:8765"):
     # 0x08000000 = CREATE_NO_WINDOW (prevents any console flashing)
     creation_flags = 0x08000000 if sys.platform.startswith("win") else 0
 
-    # Attempt to open as dedicated App window
+    # Attempt to open as dedicated App window (stop on first available browser)
     for browser_path in candidates:
         if Path(browser_path).exists():
             try:
@@ -186,16 +186,13 @@ def spawn_app_window(url: str = "http://127.0.0.1:8765"):
                     "--disable-extensions",
                     "--disable-sync"
                 ]
-                proc = subprocess.Popen(cmd, creationflags=creation_flags)
-                time.sleep(1.0)
-                
-                # If the process did not exit immediately with an error, it succeeded!
-                if proc.poll() is None:
-                    return True
+                subprocess.Popen(cmd, creationflags=creation_flags)
+                # First valid browser launched successfully - stop here!
+                return True
             except Exception:
                 continue
 
-    # Fallback guaranteed: open in user's default browser
+    # Fallback ONLY if no Chromium browser executable could be started
     webbrowser.open(url)
     return True
 

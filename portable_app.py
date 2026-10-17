@@ -14,10 +14,19 @@ import ctypes
 import threading
 import subprocess
 import webbrowser
+import socket
 import urllib.request
 from pathlib import Path
 
-# Fix for PyInstaller --noconsole mode where sys.stdout/stderr are None
+# Fix for Windows asyncio ProactorEventLoop WinError 64 / WinError 1236 crashes
+if sys.platform.startswith("win"):
+    import asyncio
+    try:
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    except Exception:
+        pass
+
+# Setup log file in %LOCALAPPDATA%\OptimaAI\launcher.log for PyInstaller --noconsole mode
 log_file_path = None
 try:
     log_dir = Path(os.environ.get("LOCALAPPDATA", os.environ.get("TEMP", "."))) / "OptimaAI"
@@ -73,7 +82,7 @@ def clean_stale_browser_locks(profile_dir: Path):
                 name = (proc.info.get('name') or '').lower()
                 if any(b in name for b in ['msedge', 'chrome', 'brave']):
                     cmd = ' '.join(proc.info.get('cmdline') or []).lower()
-                    if profile_str in cmd or 'optimaai' in cmd:
+                    if profile_str in cmd:
                         proc.kill()
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 pass
@@ -97,21 +106,33 @@ def show_error_dialog(title: str, message: str):
         except Exception:
             pass
 
-def is_server_running(url: str = "http://127.0.0.1:8765") -> bool:
-    """Checks if OptimaAI backend is already listening and responsive."""
+def is_port_open(host: str = "127.0.0.1", port: int = 8765) -> bool:
+    """Fast socket-level connectivity check."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.4)
     try:
-        with urllib.request.urlopen(f"{url}/api/health", timeout=0.6) as resp:
+        s.connect((host, port))
+        s.close()
+        return True
+    except Exception:
+        return False
+
+def is_server_ready(url: str = "http://127.0.0.1:8765") -> bool:
+    """Checks if OptimaAI backend is responsive and returning HTTP 200."""
+    try:
+        req = urllib.request.Request(f"{url}/api/health", headers={"User-Agent": "OptimaAI-Probe"})
+        with urllib.request.urlopen(req, timeout=1.0) as resp:
             return resp.status == 200
     except Exception:
         return False
 
-def wait_for_server(url: str = "http://127.0.0.1:8765", timeout_seconds: float = 12.0) -> bool:
+def wait_for_server(url: str = "http://127.0.0.1:8765", timeout_seconds: float = 15.0) -> bool:
     """Waits until FastAPI server is fully ready and returning 200 OK."""
     start = time.time()
     while time.time() - start < timeout_seconds:
-        if is_server_running(url):
+        if is_port_open("127.0.0.1", 8765) and is_server_ready(url):
             return True
-        time.sleep(0.15)
+        time.sleep(0.2)
     return False
 
 def spawn_app_window(url: str = "http://127.0.0.1:8765"):
@@ -138,23 +159,27 @@ def spawn_app_window(url: str = "http://127.0.0.1:8765"):
                     f"--user-data-dir={profile_dir}",
                     f"--app={url}",
                     "--window-size=1280,840",
+                    "--test-type",
+                    "--disable-infobars",
                     "--no-first-run",
                     "--no-default-browser-check",
                     "--disable-extensions",
-                    "--no-sandbox"  # Allows running when launched as Administrator
+                    "--disable-sync"
                 ]
                 proc = subprocess.Popen(cmd)
-                time.sleep(1.0)
+                time.sleep(1.2)
                 
-                # Check if it survived launch or exited immediately (e.g. error code 21)
+                # Check if process survived launch
                 if proc.poll() is None:
                     # Successfully running! Monitor window closing in a thread
                     def _watch_window():
+                        start_time = time.time()
                         proc.wait()
-                        # When user closes the native app window, exit cleanly
-                        time.sleep(0.3)
-                        clean_stale_browser_locks(profile_dir)
-                        os._exit(0)
+                        # Only exit if the process was running for at least 3 seconds
+                        if time.time() - start_time > 3.0:
+                            time.sleep(0.3)
+                            clean_stale_browser_locks(profile_dir)
+                            os._exit(0)
                         
                     threading.Thread(target=_watch_window, daemon=True).start()
                     return True
@@ -167,17 +192,22 @@ def spawn_app_window(url: str = "http://127.0.0.1:8765"):
 
 def launch_window_worker():
     url = "http://127.0.0.1:8765"
-    if wait_for_server(url, timeout_seconds=12.0):
+    if wait_for_server(url, timeout_seconds=15.0):
+        time.sleep(0.2)
         spawn_app_window(url)
     else:
-        # Fallback if server took unexpectedly long
-        spawn_app_window(url)
+        # If server failed to respond within 15 seconds
+        show_error_dialog(
+            "OptimaAI - Error de Inicialización",
+            "El servidor interno de OptimaAI no pudo responder en el puerto 8765.\n"
+            "Verifica que el puerto no esté ocupado por otra aplicación."
+        )
 
 def main():
     url = "http://127.0.0.1:8765"
     
     # 1. If an instance is ALREADY running on port 8765, just bring up window and exit!
-    if is_server_running(url):
+    if is_server_ready(url):
         spawn_app_window(url)
         return
 
@@ -186,11 +216,12 @@ def main():
         threading.Thread(target=launch_window_worker, daemon=True).start()
         
         # 3. Start web server serving both API and compiled React frontend
-        # log_config=None is essential for GUI --noconsole mode
+        # loop="asyncio" ensures WindowsSelectorEventLoopPolicy is used, preventing WinError 64
         uvicorn.run(
             app,
             host="127.0.0.1",
             port=8765,
+            loop="asyncio",
             log_config=None,
             access_log=False
         )

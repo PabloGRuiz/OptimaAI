@@ -7,6 +7,7 @@ import CandidateTable from './components/CandidateTable';
 import ActivityLogPanel from './components/ActivityLogPanel';
 import OllamaStatusBanner from './components/OllamaStatusBanner';
 import ProActivationModal from './components/ProActivationModal';
+import SmartGameBoostCard from './components/SmartGameBoostCard';
 import { Play, Zap, RefreshCw, AlertCircle, CheckCircle2, Rocket } from 'lucide-react';
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
   const [latestTrimSummary, setLatestTrimSummary] = useState(null);
   const [ollamaStatus, setOllamaStatus] = useState(null);
   const [licenseStatus, setLicenseStatus] = useState(null);
+  const [detectorStatus, setDetectorStatus] = useState(null);
   const [isProModalOpen, setIsProModalOpen] = useState(false);
   
   const [refreshing, setRefreshing] = useState(false);
@@ -106,18 +108,76 @@ export default function App() {
     }
   }, []);
 
+  // 5. Fetch Smart Game Detector status
+  const fetchGameDetectorStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/game-detector/status');
+      if (res.ok) {
+        const data = await res.json();
+        setDetectorStatus(data);
+      }
+    } catch (e) {
+      console.warn("Error fetching game detector status:", e);
+    }
+  }, []);
+
+  const handleToggleDetector = async (enabled) => {
+    try {
+      const res = await fetch('/api/game-detector/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled }),
+      });
+      const data = await res.json();
+      setDetectorStatus(data);
+      showToast(enabled ? "Centinela de juegos activado." : "Centinela pausado.", 'info');
+    } catch (e) {
+      showToast("Error al alternar estado del detector.", 'error');
+    }
+  };
+
+  const handleAddCustomGame = async (name) => {
+    try {
+      const res = await fetch('/api/game-detector/custom-game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      const data = await res.json();
+      setDetectorStatus(data);
+      showToast(`Juego '${name}' añadido a la lista de monitoreo.`, 'success');
+    } catch (e) {
+      showToast("Error al añadir juego personalizado.", 'error');
+    }
+  };
+
+  const handleRemoveCustomGame = async (name) => {
+    try {
+      const res = await fetch(`/api/game-detector/custom-game/${encodeURIComponent(name)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      setDetectorStatus(data);
+      showToast(`Juego '${name}' removido.`, 'info');
+    } catch (e) {
+      showToast("Error al remover juego personalizado.", 'error');
+    }
+  };
+
   useEffect(() => {
     fetchStatus();
     fetchModels();
     fetchOllamaStatus();
     fetchLogs();
     fetchLicenseStatus();
+    fetchGameDetectorStatus();
     const interval = setInterval(() => {
       fetchStatus();
       fetchOllamaStatus();
+      fetchGameDetectorStatus();
     }, 3500);
     return () => clearInterval(interval);
-  }, [fetchStatus, fetchModels, fetchOllamaStatus, fetchLogs, fetchLicenseStatus]);
+  }, [fetchStatus, fetchModels, fetchOllamaStatus, fetchLogs, fetchLicenseStatus, fetchGameDetectorStatus]);
 
   const handleLaunchOllama = async () => {
     setLaunchingOllama(true);
@@ -318,6 +378,15 @@ export default function App() {
           ollamaStatus={ollamaStatus}
           onLaunchOllama={handleLaunchOllama}
           launching={launchingOllama}
+        />
+
+        {/* Smart Game Detection & Auto-Boost Watchdog */}
+        <SmartGameBoostCard
+          detectorStatus={detectorStatus}
+          onToggleDetector={handleToggleDetector}
+          onAddCustomGame={handleAddCustomGame}
+          onRemoveCustomGame={handleRemoveCustomGame}
+          onOpenProModal={() => setIsProModalOpen(true)}
         />
 
         {/* Primary Action Controls Bar */}

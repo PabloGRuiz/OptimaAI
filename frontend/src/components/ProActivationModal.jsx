@@ -177,7 +177,7 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
                 </p>
               </div>
               <a
-                href="https://www.patreon.com"
+                href="https://patreon.com/Reselec"
                 target="_blank"
                 rel="noreferrer"
                 className="shrink-0 px-3 py-1.5 rounded-lg bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white font-semibold text-xs flex items-center gap-1 shadow-md shadow-rose-500/20 transition-all"

@@ -409,6 +409,7 @@ class SystemActionExecutor:
             "total_freed_ram_mb": total_freed_mb,
             "processes_trimmed_count": count_trimmed,
             "throttled_count": len(throttled_processes),
+            "throttled_pids": [item["pid"] for item in throttled_processes],
             "throttled_processes": throttled_processes[:10],
             "top_reclaimed": [p.model_dump() for p in top_reclaimed[:8]],
             "message": (

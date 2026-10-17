@@ -7,11 +7,12 @@
   <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC?logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Ollama-Local%20LLM-black?logo=ollama&logoColor=white" alt="Ollama Local LLM" />
   <img src="https://img.shields.io/badge/Windows-Portable%20x64-0078D6?logo=windows&logoColor=white" alt="Windows x64" />
+  <a href="https://patreon.com/Reselec" target="_blank"><img src="https://img.shields.io/badge/Patreon-Support_Reselec-FF424D?logo=patreon&logoColor=white" alt="Patreon Support" /></a>
   <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License" />
 </p>
 
 <p align="center">
-  <b>Language / Idioma:</b> <a href="#-english">🇬🇧 English</a> | <a href="#-español">🇪🇸 Español</a>
+  <b>Language / Idioma:</b> <a href="#-english">🇬🇧 English</a> | <a href="#-español">🇪🇸 Español</a> | <a href="https://patreon.com/Reselec">❤️ Patreon</a>
 </p>
 
 ---

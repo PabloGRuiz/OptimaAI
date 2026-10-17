@@ -23,12 +23,16 @@ from backend.core.ollama_client import ollama_engine, DiagnosticResponse
 from backend.core.ollama_manager import ollama_manager
 from backend.core.executor import action_executor, BatchExecutionSummary, ActionResult
 from backend.core.license_manager import license_manager, LicenseStatus
+from backend.core.game_detector import game_detector, GameDetectorStatus
 
 app = FastAPI(
     title=settings.app_name,
     version=settings.version,
     description="Backend API para Optima AI System Optimizer"
 )
+
+# Start real-time Smart Game Detection watchdog
+game_detector.start_background_monitor()
 
 # Enable CORS for local desktop UI (Vite / localhost)
 app.add_middleware(
@@ -56,6 +60,12 @@ class ConfigureModelRequest(BaseModel):
 
 class ActivateLicenseRequest(BaseModel):
     key: str
+
+class ToggleGameDetectorRequest(BaseModel):
+    enabled: bool
+
+class CustomGameRequest(BaseModel):
+    name: str
 
 # Audit log storage
 _execution_logs: List[Dict[str, Any]] = []
@@ -111,6 +121,40 @@ def deactivate_pro_license():
     """
     license_manager.deactivate()
     return license_manager.get_status().model_dump()
+
+@app.get("/api/game-detector/status")
+def get_game_detector_status():
+    """
+    Returns Smart Game Detector state, active game (if running), and monitored platforms.
+    """
+    return game_detector.get_status().model_dump()
+
+@app.post("/api/game-detector/toggle")
+def toggle_game_detector(req: ToggleGameDetectorRequest):
+    """
+    Enables or pauses the Smart Game Detector watchdog.
+    """
+    game_detector.enabled = req.enabled
+    return game_detector.get_status().model_dump()
+
+@app.post("/api/game-detector/custom-game")
+def add_custom_game_target(req: CustomGameRequest):
+    """
+    Registers a custom game executable name (e.g., 'mygame.exe').
+    """
+    game_detector.add_custom_game(req.name)
+    return game_detector.get_status().model_dump()
+
+@app.delete("/api/game-detector/custom-game/{name}")
+@app.delete("/api/game-detector/custom-game")
+def remove_custom_game_target(name: Optional[str] = None, req: Optional[CustomGameRequest] = None):
+    """
+    Removes a custom game executable name from monitored targets.
+    """
+    target = name or (req.name if req else "")
+    if target:
+        game_detector.remove_custom_game(target)
+    return game_detector.get_status().model_dump()
 
 @app.get("/api/health")
 def get_health():

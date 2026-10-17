@@ -150,15 +150,15 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>Detección de Juegos</span>
+                <span>HUD Overlay In-Game</span>
               </div>
               <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-cyan-400 shrink-0" />
-                <span>Centinela de Fondo</span>
+                <span>Auto-Boost de Juegos</span>
               </div>
               <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
                 <Key className="h-4 w-4 text-purple-400 shrink-0" />
-                <span>Limpieza de Shaders</span>
+                <span>Prioridad CPU Alta</span>
               </div>
               <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
                 <Crown className="h-4 w-4 text-yellow-400 shrink-0" />

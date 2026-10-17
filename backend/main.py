@@ -25,6 +25,8 @@ from backend.core.executor import action_executor, BatchExecutionSummary, Action
 from backend.core.license_manager import license_manager, LicenseStatus
 from backend.core.game_detector import game_detector, GameDetectorStatus
 from backend.core.audit_logger import audit_logger
+from backend.core.gpu_telemetry import gpu_telemetry
+from backend.core.game_overlay import game_overlay
 
 app = FastAPI(
     title=settings.app_name,
@@ -36,6 +38,7 @@ app = FastAPI(
 def on_startup():
     # Start real-time Smart Game Detection watchdog after all modules are fully loaded
     game_detector.start_background_monitor()
+    gpu_telemetry.start()
 
 # Enable CORS for local desktop UI (Vite / localhost)
 app.add_middleware(
@@ -69,6 +72,10 @@ class ToggleGameDetectorRequest(BaseModel):
 
 class CustomGameRequest(BaseModel):
     name: str
+
+class ToggleOverlayRequest(BaseModel):
+    enabled: bool
+    position: Optional[str] = "top-right"
 
 def add_log_entry(entry: Dict[str, Any]):
     audit_logger.add_entry(entry)
@@ -150,6 +157,51 @@ def remove_custom_game_target(name: Optional[str] = None, req: Optional[CustomGa
     if target:
         game_detector.remove_custom_game(target)
     return game_detector.get_status().model_dump()
+
+@app.get("/api/gaming/telemetry")
+def get_gaming_telemetry():
+    """
+    Returns live cross-vendor GPU, VRAM, CPU, RAM, and FPS telemetry.
+    Available to all users inside the app.
+    """
+    snap = gpu_telemetry.get_snapshot()
+    lic = license_manager.get_status()
+    active = game_detector.active_game
+    snap["is_pro"] = lic.is_pro
+    snap["overlay_active"] = game_overlay.is_active
+    snap["auto_overlay"] = game_detector.auto_overlay
+    snap["overlay_position"] = game_overlay.position
+    snap["active_game"] = active.model_dump() if active else None
+    return snap
+
+@app.post("/api/gaming/overlay/toggle")
+def toggle_gaming_overlay(req: ToggleOverlayRequest):
+    """
+    Toggles the floating In-Game click-through overlay (PRO Exclusive).
+    """
+    lic = license_manager.get_status()
+    if not lic.is_pro:
+        return {
+            "success": False,
+            "is_pro": False,
+            "overlay_active": False,
+            "message": "El Overlay Flotante In-Game es exclusivo de OptimaAI Pro. Desbloquéalo con tu clave o en Patreon."
+        }
+    
+    game_detector.auto_overlay = req.enabled
+    if req.enabled:
+        pos = req.position or "top-right"
+        game_overlay.start_overlay(position=pos)
+    else:
+        game_overlay.stop_overlay()
+
+    return {
+        "success": True,
+        "is_pro": True,
+        "overlay_active": game_overlay.is_active,
+        "position": game_overlay.position,
+        "auto_overlay": game_detector.auto_overlay
+    }
 
 @app.get("/api/health")
 def get_health():

@@ -113,6 +113,7 @@ class GameDetectorStatus(BaseModel):
 class SmartGameDetector:
     def __init__(self):
         self.enabled: bool = True
+        self.auto_overlay: bool = True
         self.active_game: Optional[DetectedGame] = None
         self.custom_games: Set[str] = set()
         self._throttled_pids: List[int] = []
@@ -258,6 +259,14 @@ class SmartGameDetector:
             boost_res = action_executor.apply_game_boost()
             self._throttled_pids = boost_res.get("throttled_pids", [])
 
+            # 3. Auto-launch In-Game HUD overlay if enabled
+            try:
+                from backend.core.game_overlay import game_overlay
+                if getattr(self, "auto_overlay", True):
+                    game_overlay.start_overlay()
+            except Exception:
+                pass
+
             audit_logger.add_entry({
                 "timestamp": now_str,
                 "type": "smart_game_boost_started",
@@ -291,6 +300,12 @@ class SmartGameDetector:
         self._restore_system_priorities()
         self.active_game = None
         self._last_event = f"Juego cerrado ({game_name}). Prioridades de Windows restauradas a la normalidad a las {now_str}."
+
+        try:
+            from backend.core.game_overlay import game_overlay
+            game_overlay.stop_overlay()
+        except Exception:
+            pass
 
         from backend.core.audit_logger import audit_logger
         audit_logger.add_entry({

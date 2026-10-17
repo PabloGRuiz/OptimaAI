@@ -1,7 +1,7 @@
 # ⚡ OptimaAI - Next-Gen Desktop System Optimizer & Gaming HUD
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-v1.1.0-6366F1?style=for-the-badge" alt="Version 1.1.0" />
+  <img src="https://img.shields.io/badge/Version-v1.2.0-6366F1?style=for-the-badge" alt="Version 1.2.0" />
   <img src="https://img.shields.io/badge/Windows-Portable%20x64-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x64" />
   <a href="https://patreon.com/Reselec" target="_blank"><img src="https://img.shields.io/badge/Patreon-Support_Reselec-FF424D?style=for-the-badge&logo=patreon&logoColor=white" alt="Patreon Support" /></a>
 </p>
@@ -34,7 +34,7 @@ No need to install Python, Node.js, or configure command line tools. Download th
 
 <p align="center">
   <a href="https://github.com/PabloGRuiz/OptimaAI/releases/latest">
-    <img src="https://img.shields.io/badge/⬇️_DOWNLOAD_OPTIMAAI.EXE-Latest_Release_(v1.1.0)-brightgreen?style=for-the-badge&logo=windows" alt="Download OptimaAI.exe" height="42" />
+    <img src="https://img.shields.io/badge/⬇️_DOWNLOAD_OPTIMAAI.EXE-Latest_Release_(v1.2.0)-brightgreen?style=for-the-badge&logo=windows" alt="Download OptimaAI.exe" height="42" />
   </a>
 </p>
 
@@ -46,7 +46,7 @@ No need to install Python, Node.js, or configure command line tools. Download th
 
 ---
 
-### ✨ Key Features in v1.1.0
+### ✨ Key Features in v1.2.0
 
 #### 🎮 1. Smart Game Detection & Auto-Boost
 - **Autonomous Detection:** Real-time polling identifies full-screen 3D games and graphics workloads automatically (Steam, Epic Games, Riot, standalone binaries).

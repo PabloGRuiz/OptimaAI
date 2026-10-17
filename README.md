@@ -1,4 +1,10 @@
-# ⚡ OptimaAI - Next-Gen Desktop System Optimizer
+# ⚡ OptimaAI - Next-Gen Desktop System Optimizer & Gaming HUD
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-v1.1.0-6366F1?style=for-the-badge" alt="Version 1.1.0" />
+  <img src="https://img.shields.io/badge/Windows-Portable%20x64-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x64" />
+  <a href="https://patreon.com/Reselec" target="_blank"><img src="https://img.shields.io/badge/Patreon-Support_Reselec-FF424D?style=for-the-badge&logo=patreon&logoColor=white" alt="Patreon Support" /></a>
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+" />
@@ -6,13 +12,11 @@
   <img src="https://img.shields.io/badge/Vite-Fast-646CFF?logo=vite&logoColor=white" alt="Vite" />
   <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC?logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Ollama-Local%20LLM-black?logo=ollama&logoColor=white" alt="Ollama Local LLM" />
-  <img src="https://img.shields.io/badge/Windows-Portable%20x64-0078D6?logo=windows&logoColor=white" alt="Windows x64" />
-  <a href="https://patreon.com/Reselec" target="_blank"><img src="https://img.shields.io/badge/Patreon-Support_Reselec-FF424D?logo=patreon&logoColor=white" alt="Patreon Support" /></a>
   <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License" />
 </p>
 
 <p align="center">
-  <b>Language / Idioma:</b> <a href="#-english">🇬🇧 English</a> | <a href="#-español">🇪🇸 Español</a> | <a href="https://patreon.com/Reselec">❤️ Patreon</a>
+  <b>Language / Idioma:</b> <a href="#-english">🇬🇧 English</a> | <a href="#-español">🇪🇸 Español</a> | <a href="https://patreon.com/Reselec">❤️ Support on Patreon</a>
 </p>
 
 ---
@@ -20,52 +24,80 @@
 <a name="-english"></a>
 ## 🇬🇧 English
 
-**OptimaAI** is a modern, high-performance desktop system optimizer and performance analyzer for Windows. It combines low-level OS telemetry with the contextual intelligence of **local LLMs via Ollama** (`llama3.2`, `llama3.1`, `mistral`, `qwen2.5`) with GPU/VRAM acceleration, along with an **Autonomous Heuristic Engine** for instant optimization on any PC.
+**OptimaAI** is a cutting-edge desktop performance analyzer, gaming booster, and in-game HUD overlay for Windows 10/11. It combines low-level OS telemetry with the contextual intelligence of **local LLMs via Ollama** (`llama3.2`, `llama3.1`, `mistral`, `qwen2.5`) accelerated by GPU/VRAM, backed by an **Autonomous Heuristic Engine** for instant, zero-latency optimization on any system.
 
 ---
 
 ### 🚀 Quick Download (Zero-Setup Portable Executable)
 
-No need to install Python, Node.js, or configure terminal environments. Download the standalone executable:
+No need to install Python, Node.js, or configure command line tools. Download the standalone executable:
 
 <p align="center">
   <a href="https://github.com/PabloGRuiz/OptimaAI/releases/latest">
-    <img src="https://img.shields.io/badge/⬇️_DOWNLOAD_OPTIMAAI.EXE-Latest_Release-brightgreen?style=for-the-badge&logo=windows" alt="Download OptimaAI.exe" height="42" />
+    <img src="https://img.shields.io/badge/⬇️_DOWNLOAD_OPTIMAAI.EXE-Latest_Release_(v1.1.0)-brightgreen?style=for-the-badge&logo=windows" alt="Download OptimaAI.exe" height="42" />
   </a>
 </p>
 
-* **Zero-Setup:** Single portable `.exe` file (~36 MB). No external runtime needed.
-* **100% Autonomous:** Double-click `OptimaAI.exe` and the interface opens automatically in your browser at `http://127.0.0.1:8765`.
-* **Smart Dual Mode:**
-  * **With Ollama:** In-depth AI system diagnosis accelerated by your GPU (NVIDIA CUDA / AMD ROCm).
-  * **Without Ollama:** Instant fallback to the **Ultra-Fast Heuristic Engine** with deterministic rules.
+* **Zero-Setup:** Single portable `.exe` file (~39 MB). Self-contained web server, frontend, and telemetry engine.
+* **100% Autonomous:** Double-click `OptimaAI.exe` and your default browser opens automatically to `http://127.0.0.1:8765`.
+* **Smart Dual Engine:**
+  * **With Ollama:** In-depth AI system diagnosis powered by local LLMs with GPU VRAM acceleration (NVIDIA CUDA / AMD ROCm).
+  * **Without Ollama:** Instant fallback to the **Ultra-Fast Heuristic Engine** with deterministic rules in <20 ms.
 
 ---
 
-### ✨ Key Features
+### ✨ Key Features in v1.1.0
 
-#### 🧠 1. Hybrid Architecture: Local AI + Deterministic Heuristics
-- **GPU VRAM Accelerated Inference:** Asynchronous streaming connection to Ollama with structured JSON (`llama3.2:latest`), pre-warmed in VRAM (`keep_alive: 30m`) for answers in ~4–5 seconds.
-- **Sub-20ms Heuristic Fallback:** If Ollama is offline or not installed, OptimaAI evaluates differential CPU and memory working sets using deterministic algorithms in under 20 ms.
-- **Resource-Aware Ollama Manager:** Informs the user that Ollama consumes 0% CPU and 0 MB VRAM when idle, with 1-click startup directly from the dashboard.
+#### 🎮 1. Smart Game Detection & Auto-Boost
+- **Autonomous Detection:** Real-time polling identifies full-screen 3D games and graphics workloads automatically (Steam, Epic Games, Riot, standalone binaries).
+- **Deep Working Set Trimming (`EmptyWorkingSet`):** Safely flushes idle RAM pages from background browsers, Discord, and launchers back to the operating system without killing them.
+- **Smart CPU Throttling:** Relegates background tasks to `IDLE_PRIORITY_CLASS`, granting 100% of CPU time slices to your active game.
+- **Auto-Boost Sentinel:** Automatically engages optimization when a game launches and safely restores default states upon exit.
 
-#### 🎮 2. 1-Click Game Boost (Extreme Performance)
-- **Deep Working Set Trimming (`EmptyWorkingSet`):** Reclaims inactive RAM pages from background processes without killing them, returning hundreds of megabytes directly to the OS.
-- **Smart CPU Throttling:** Relegates background apps (game launchers, secondary browsers, Discord) to `IDLE_PRIORITY_CLASS`, granting 100% of CPU cycles to your active game or workload.
+#### 📊 2. Universal GPU & Gaming Telemetry (AMD / NVIDIA / Intel)
+- **Zero-Overhead PDH Sampling:** Native Windows Performance Data Helper counters query `\GPU Engine(*_engtype_3D)\Utilization Percentage` and `\GPU Adapter Memory(*)\Total Committed`.
+- **Instant Live Metrics:**
+  - Real-Time Game FPS (DirectX / Vulkan polling).
+  - Dedicated GPU 3D load percentage and VRAM consumption.
+  - Per-game isolated CPU utilization and memory footprint.
 
-#### 🛡️ 3. Strict Safe List & Camouflage Shield
-- **Kernel Protection:** Hardcoded guardrails prevent killing core system processes (`smss.exe`, `csrss.exe`, `services.exe`, `lsass.exe`, `dwm.exe`, `explorer.exe`).
-- **Anti-Camouflage Detection:** Flags suspicious processes attempting to mimic system names (e.g., `svchost.exe` running from `%TEMP%` or user folders).
+#### 🖥️ 3. Click-Through In-Game HUD Overlay (⭐ Pro Exclusive)
+- **Native Non-Intrusive HUD:** Transparent, hardware-accelerated Tkinter overlay rendered directly over borderless and windowed games.
+- **Total Click-Through:** Built with Win32 API styles `WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE` — zero input lag, clicks pass directly to your crosshair and game controls.
+- **Customizable Layout:** Real-time position switcher between **Top-Right** and **Top-Left** corners with live visual meters.
+- **Persistent Daemon Stability:** Survives game launches, alt-tabs, and closures without UI freezing or crashes.
 
-#### 📋 4. Transparent Audit & Live Activity Logs
-- Comprehensive log panel documenting why each process was trimmed or closed, the exact Win32 API mechanism used, and reclaimed RAM numbers.
+#### 🔑 4. Offline Cryptographic Pro Licensing (HMAC-SHA256)
+- **Zero Cloud Dependence:** Licenses are verified completely offline using SHA-256 digital signatures with payload validation (`OPTIMA-HOLDER-TIER-EXPIRY-SIGNATURE`).
+- **Patreon Community Support:** Get your personalized Pro key directly through [Patreon](https://patreon.com/Reselec).
 
-#### 🎨 5. Fluid 60/144 FPS Dark Glassmorphism UI
-- Built with **React 18 + Vite + Tailwind CSS**. Hardware-accelerated CSS compositor, live hardware gauges (CPU, RAM, Disk, Process count), and dark glass aesthetics.
+#### 🛡️ 5. SafeList Shield & Anti-Camouflage Detection
+- **Kernel Guardrails:** Hardcoded protection guarantees critical system components (`smss.exe`, `csrss.exe`, `services.exe`, `lsass.exe`, `dwm.exe`, `explorer.exe`) can never be terminated.
+- **Anti-Camouflage Defense:** Detects rogue processes attempting to impersonate legitimate system binaries from `%TEMP%` or user profiles.
+
+#### 🎨 6. Fluid Dark Glassmorphism UI
+- Built with **React 18 + Vite + Tailwind CSS**. Hardware-accelerated CSS compositor, live radial system gauges, AI diagnosis cards, and an interactive audit log.
 
 ---
 
-### 🛠️ Architecture
+### 👑 Community vs. Pro Edition Comparison
+
+| Feature | Community (Free) | Pro Edition ⭐ |
+| :--- | :---: | :---: |
+| **Hybrid AI + Heuristic Optimizer** | ✅ | ✅ |
+| **1-Click Game Boost & RAM Trimming** | ✅ | ✅ |
+| **SafeList & Anti-Camouflage Shield** | ✅ | ✅ |
+| **In-App Gaming Telemetry (FPS, GPU, VRAM)** | ✅ | ✅ |
+| **Smart Game Auto-Detection Sentinel** | ✅ | ✅ |
+| **Click-Through In-Game HUD Overlay** | ❌ | **✅** |
+| **HUD Custom Corner Alignment** | ❌ | **✅** |
+| **Supporter Discord & Priority Updates** | ❌ | **✅** |
+
+> 💡 *To activate Pro, visit [patreon.com/Reselec](https://patreon.com/Reselec), get your key, click **Activar PRO** in the dashboard, and paste your key.*
+
+---
+
+### 🛠️ Architecture Overview
 
 ```text
 ┌────────────────────────────────────────────────────────┐
@@ -77,7 +109,10 @@ No need to install Python, Node.js, or configure terminal environments. Download
 │             FastAPI Core Bridge (Python)               │
 ├────────────────────────────┬───────────────────────────┤
 │    Telemetry Collector     │     Security Shield       │
-│  (psutil Differential Δ)   │ (Strict SafeList + UAC)   │
+│  (psutil + Win32 PDH GPU)  │ (Strict SafeList + UAC)   │
+├────────────────────────────┼───────────────────────────┤
+│   In-Game HUD Overlay      │   Offline HMAC Key Engine │
+│ (Transparent Click-Through)│ (Deterministic Pro Auth)  │
 ├────────────────────────────┼───────────────────────────┤
 │     Ollama AI Engine       │   Action & Memory Exec    │
 │ (GPU VRAM / llama3.2 JSON) │ (EmptyWorkingSet Trimmer) │
@@ -94,7 +129,7 @@ No need to install Python, Node.js, or configure terminal environments. Download
 * *(Optional)* [Ollama](https://ollama.com/) with: `ollama run llama3.2:latest`
 
 ```bash
-# 1. Clone the repository
+# 1. Clone repository
 git clone https://github.com/PabloGRuiz/OptimaAI.git
 cd OptimaAI
 
@@ -118,48 +153,76 @@ python build_exe.py
 <a name="-español"></a>
 ## 🇪🇸 Español
 
-**OptimaAI** es un optimizador de sistema y analizador de rendimiento moderno de alto rendimiento para Windows. Combina la potencia del análisis de telemetría a bajo nivel con la inteligencia contextual de **modelos LLM locales en Ollama** (`llama3.2`, `llama3.1`, `mistral`, `qwen2.5`) acelerados por GPU/VRAM, junto a un **Motor Heurístico Autónomo** para garantizar funcionamiento instantáneo en cualquier PC.
+**OptimaAI** es un optimizador de sistema de alto rendimiento, acelerador para gaming y visualizador HUD in-game para Windows 10/11. Combina telemetría a bajo nivel del sistema operativo con la inteligencia contextual de **modelos LLM locales vía Ollama** (`llama3.2`, `llama3.1`, `mistral`, `qwen2.5`) acelerados por GPU/VRAM, respaldado por un **Motor Heurístico Autónomo** para optimización instantánea y sin latencia en cualquier PC.
 
 ---
 
-### 🚀 Descarga Rápida (Ejecutable Portable sin Dependencias)
+### 🚀 Descarga Rápida (Ejecutable Portable sin Instalación)
 
-¿No quieres instalar Python ni compilar código? Puedes descargar el ejecutable listo para usar:
+No necesitas instalar Python, Node.js ni configurar terminales. Descarga el ejecutable listo para usar:
 
 <p align="center">
   <a href="https://github.com/PabloGRuiz/OptimaAI/releases/latest">
-    <img src="https://img.shields.io/badge/⬇️_DESCARGAR_OPTIMAAI.EXE-Última_Versión-brightgreen?style=for-the-badge&logo=windows" alt="Descargar OptimaAI.exe" height="42" />
+    <img src="https://img.shields.io/badge/⬇️_DESCARGAR_OPTIMAAI.EXE-Última_Versión_(v1.1.0)-brightgreen?style=for-the-badge&logo=windows" alt="Descargar OptimaAI.exe" height="42" />
   </a>
 </p>
 
-* **Zero-Setup:** No requiere instalar Python, Node.js ni configurar terminales. Archivo `.exe` de ~36 MB.
-* **100% Autónomo:** Doble clic en `OptimaAI.exe` y la interfaz se abre en tu navegador predeterminado en `http://127.0.0.1:8765`.
+* **Cero Instalación:** Archivo `.exe` único (~39 MB). Incluye servidor web integrado, interfaz React compilada y motor de telemetría nativo.
+* **100% Autónomo:** Doble clic en `OptimaAI.exe` y se abre automáticamente en tu navegador en `http://127.0.0.1:8765`.
 * **Modo Dual Inteligente:**
-  * **Si tienes Ollama:** Obtienes diagnósticos profundos con IA acelerados por tu tarjeta gráfica (AMD ROCm / NVIDIA CUDA).
-  * **Si NO tienes Ollama:** Funciona de inmediato en **Modo Heurístico Ultrarrápido** con reglas de optimización seguras.
+  * **Con Ollama:** Diagnósticos profundos mediante IA local acelerada por GPU (NVIDIA CUDA / AMD ROCm).
+  * **Sin Ollama:** Respaldo automático al **Motor Heurístico Ultrarrápido** con reglas deterministas en <20 ms.
 
 ---
 
-### ✨ Características Principales
+### ✨ Nuevas Características en v1.1.0
 
-#### 🧠 1. Modo Híbrido: IA Local + Motor Heurístico Determinista
-- **Inferencia Neuronal con GPU:** Conexión asíncrona a Ollama con JSON estructurado (`llama3.2:latest`), manteniendo el modelo precargado en VRAM (`keep_alive: 30m`) para respuestas en ~4-5 segundos.
-- **Respaldo Heurístico Instantáneo:** Si Ollama está cerrado o ausente, OptimaAI evalúa el uso de CPU diferencial y memoria de trabajo en <20 ms mediante algoritmos matemáticos deterministas.
-- **Gestor Transparente de Ollama:** Notifica al usuario de que Ollama no consume recursos en reposo (0% CPU, 0 MB VRAM) y permite iniciarlo con 1 solo clic.
+#### 🎮 1. Detección Inteligente de Juegos & Auto-Boost
+- **Detección en Tiempo Real:** Identifica automáticamente cuando un juego o carga gráfica 3D se inicia (Steam, Epic Games, Riot o ejecutables independientes).
+- **Vaciado Profundo de Memoria (`EmptyWorkingSet`):** Libera páginas de memoria RAM inactivas en procesos secundarios (navegadores, Discord, launchers) devolviendo cientos de megabytes al sistema operativo sin cerrarlos.
+- **Throttling Inteligente de CPU:** Asigna prioridad `IDLE_PRIORITY_CLASS` a tareas secundarias para garantizar que tu juego reciba el 100% de los ciclos de la CPU.
+- **Centinela Auto-Boost:** Activa la optimización automáticamente al detectar un juego y restaura las prioridades normales al salir.
 
-#### 🎮 2. Game Boost (Modo Máximo Rendimiento)
-- **Vaciado Profundo de Memoria (`EmptyWorkingSet`):** Libera páginas de memoria RAM inactivas en procesos de fondo sin cerrarlos, devolviendo cientos de megabytes al sistema operativo al instante.
-- **Throttling Inteligente de CPU:** Asigna prioridad `IDLE_PRIORITY_CLASS` a aplicaciones secundarias (launchers, navegadores de fondo, Discord, etc.) para que tu juego disponga del 100% de los ciclos de procesador.
+#### 📊 2. Telemetría Universal de GPU y Juegos (AMD / NVIDIA / Intel)
+- **Muestreo Nativo Windows PDH:** Consulta contadores nativos de rendimiento `\GPU Engine(*_engtype_3D)\Utilization Percentage` y `\GPU Adapter Memory(*)\Total Committed` con 0% de sobrecarga.
+- **Métricas Clave en Vivo:**
+  - FPS del juego en tiempo real (polling DirectX / Vulkan).
+  - Carga 3D de la GPU y consumo de memoria VRAM dedicada.
+  - Consumo exacto de CPU y memoria RAM del juego en ejecución.
 
-#### 🛡️ 3. Safe List Estricta & Detección de Suplantación (Camouflage Shield)
-- **Blindaje del Kernel:** Imposibilidad técnica de terminar componentes críticos del sistema (`smss.exe`, `csrss.exe`, `services.exe`, `lsass.exe`, `dwm.exe`, `explorer.exe`).
-- **Anti-Camuflaje:** Detecta procesos anómalos que intentan disfrazarse de binarios del sistema (ej. `svchost.exe` corriendo desde `%TEMP%` o carpetas temporales).
+#### 🖥️ 3. Overlay HUD In-Game Transparente (⭐ Exclusivo Pro)
+- **HUD Integrado No Intrusivo:** Ventana flotante transparente sobre juegos en modo ventana o ventana sin bordes.
+- **Click-Through Total:** Implementado mediante estilos Win32 `WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE` — cero input lag, los clics pasan directamente a la mira y los controles de tu juego.
+- **Posición Configurable:** Cambia en vivo la ubicación del HUD entre la **esquina superior derecha** y la **esquina superior izquierda**.
+- **Estabilidad con Demonio Persistente:** Sobrevive a alt-tabs, inicios y cierres de juegos sin congelarse ni cerrarse abruptamente.
 
-#### 📋 4. Registro de Auditoría & Transparencia Total
-- Panel en tiempo real que explica exactamente qué proceso se optimizó, cuántos MB de RAM se recuperaron y el mecanismo técnico Win32 utilizado.
+#### 🔑 4. Licenciamiento Criptográfico Offline (HMAC-SHA256)
+- **Sin Dependencia de Internet:** Validación matemática fuera de línea mediante firmas digitales HMAC (`OPTIMA-TITULAR-NIVEL-EXPIRACION-FIRMA`).
+- **Apoyo Comunitario:** Consigue tu clave personalizada apoyando el proyecto en [Patreon](https://patreon.com/Reselec).
 
-#### 🎨 5. Interfaz Gráfica Fluida a 60/144 FPS
-- Construida en **React 18 + Vite + Tailwind CSS** con renderizado acelerado por hardware e indicadores en vivo.
+#### 🛡️ 5. SafeList Estricta & Detección Anti-Camuflaje
+- **Blindaje del Kernel:** Bloqueo hardcoded que previene terminar procesos críticos (`smss.exe`, `csrss.exe`, `services.exe`, `lsass.exe`, `dwm.exe`, `explorer.exe`).
+- **Defensa Anti-Camuflaje:** Detecta procesos sospechosos simulando ser del sistema corriendo desde `%TEMP%` o carpetas de usuario.
+
+#### 🎨 6. Interfaz Glassmorphism Oscura Fluida
+- Construida en **React 18 + Vite + Tailwind CSS** con aceleración por hardware, medidores radiales y panel de auditoría detallado.
+
+---
+
+### 👑 Comparativa Community vs. Edición Pro
+
+| Característica | Community (Gratis) | Edición Pro ⭐ |
+| :--- | :---: | :---: |
+| **Optimizador Híbrido IA + Heurística** | ✅ | ✅ |
+| **1-Click Game Boost & Limpieza de RAM** | ✅ | ✅ |
+| **Blindaje SafeList & Anti-Camuflaje** | ✅ | ✅ |
+| **Telemetría en App (FPS, GPU, VRAM)** | ✅ | ✅ |
+| **Centinela Auto-Boost para Juegos** | ✅ | ✅ |
+| **Overlay HUD In-Game Click-Through** | ❌ | **✅** |
+| **Configuración de Esquina para el HUD** | ❌ | **✅** |
+| **Rol en Discord & Actualizaciones Prioritarias** | ❌ | **✅** |
+
+> 💡 *Para activar Pro, visita [patreon.com/Reselec](https://patreon.com/Reselec), obtén tu clave, haz clic en **Activar PRO** en el dashboard y pégala.*
 
 ---
 

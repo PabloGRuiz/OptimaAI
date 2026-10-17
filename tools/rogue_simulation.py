@@ -39,7 +39,7 @@ def main():
         t.start()
 
     print("\n" + "-" * 65)
-    print(" INSTRUCCIONES PARA LA PRUEBA / VIDEO:")
+    print(" INSTRUCCIONES PARA LA PRUEBA:")
     print(" 1. Deja esta ventana abierta.")
     print(" 2. Abre OptimaAI.")
     print(" 3. Haz clic en 'Iniciar Examen Extenso'.")

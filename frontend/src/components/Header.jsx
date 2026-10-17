@@ -22,7 +22,9 @@ export default function Header({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-white">Optima</h1>
+              <h1 className="text-xl font-bold tracking-tight text-white">
+                Optima<span className="text-indigo-400">AI</span>
+              </h1>
               {ollamaStatus?.is_running ? (
                 <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                   <Sparkles className="h-3 w-3" /> IA Local Activa

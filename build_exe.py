@@ -43,7 +43,7 @@ def build_executable():
     cmd = [
         sys.executable,
         "-m", "PyInstaller",
-        "--name=Optima",
+        "--name=OptimaAI",
         "--onefile",
         "--clean",
         "--noconfirm",
@@ -70,7 +70,7 @@ def build_executable():
     print("    " + " ".join(cmd[:8]) + " ...")
     subprocess.check_call(cmd, cwd=str(ROOT_DIR))
 
-    output_exe = ROOT_DIR / "dist" / ("Optima.exe" if sys.platform.startswith("win") else "Optima")
+    output_exe = ROOT_DIR / "dist" / ("OptimaAI.exe" if sys.platform.startswith("win") else "OptimaAI")
     if output_exe.exists():
         size_mb = round(output_exe.stat().st_size / (1024 * 1024), 2)
         print("\n" + "=" * 60)

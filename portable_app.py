@@ -29,7 +29,7 @@ def open_browser():
 def main():
     try:
         print("=" * 65)
-        print("  OPTIMA - AI & HEURISTIC SYSTEM OPTIMIZER")
+        print("  OPTIMAAI - AI & HEURISTIC SYSTEM OPTIMIZER")
         print("  Iniciando servidor local y abriendo interfaz gráfica...")
         print("=" * 65)
         print("  Acceso web local: http://127.0.0.1:8765")

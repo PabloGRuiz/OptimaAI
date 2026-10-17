@@ -40,7 +40,7 @@ pnpm-debug.log*
 
 # PyInstaller / Build Artifacts
 *.manifest
-Optima.spec
+*.spec
 
 # IDEs & System
 .vscode/

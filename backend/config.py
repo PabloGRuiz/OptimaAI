@@ -116,7 +116,7 @@ class SecurityConfig(BaseModel):
     ])
 
 class AppSettings(BaseModel):
-    app_name: str = "Optima System AI Optimizer"
+    app_name: str = "OptimaAI"
     version: str = "1.0.0"
     ollama: OllamaConfig = Field(default_factory=OllamaConfig)
     telemetry: TelemetryConfig = Field(default_factory=TelemetryConfig)

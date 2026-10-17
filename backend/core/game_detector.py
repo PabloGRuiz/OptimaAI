@@ -243,7 +243,7 @@ class SmartGameDetector:
         self._last_event = f"🎮 Jugando a {game.name} ({game.platform}). Auto-Boost aplicado a las {now_str}."
 
         from backend.core.executor import action_executor
-        from backend.main import add_log_entry
+        from backend.core.audit_logger import audit_logger
 
         # Only apply full Pro Auto-Boost actions if user is Pro
         is_pro = license_manager.get_status().is_pro
@@ -258,7 +258,7 @@ class SmartGameDetector:
             boost_res = action_executor.apply_game_boost()
             self._throttled_pids = boost_res.get("throttled_pids", [])
 
-            add_log_entry({
+            audit_logger.add_entry({
                 "timestamp": now_str,
                 "type": "smart_game_boost_started",
                 "action_title": f"🎮 Smart Game Boost: {game.name}",
@@ -273,7 +273,7 @@ class SmartGameDetector:
                 )
             })
         else:
-            add_log_entry({
+            audit_logger.add_entry({
                 "timestamp": now_str,
                 "type": "game_detected_free",
                 "action_title": f"🎮 Juego detectado: {game.name}",
@@ -292,8 +292,8 @@ class SmartGameDetector:
         self.active_game = None
         self._last_event = f"Juego cerrado ({game_name}). Prioridades de Windows restauradas a la normalidad a las {now_str}."
 
-        from backend.main import add_log_entry
-        add_log_entry({
+        from backend.core.audit_logger import audit_logger
+        audit_logger.add_entry({
             "timestamp": now_str,
             "type": "smart_game_boost_ended",
             "action_title": f"🎮 Juego finalizado: {game_name}",

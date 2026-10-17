@@ -24,6 +24,7 @@ from backend.core.ollama_manager import ollama_manager
 from backend.core.executor import action_executor, BatchExecutionSummary, ActionResult
 from backend.core.license_manager import license_manager, LicenseStatus
 from backend.core.game_detector import game_detector, GameDetectorStatus
+from backend.core.audit_logger import audit_logger
 
 app = FastAPI(
     title=settings.app_name,
@@ -31,8 +32,10 @@ app = FastAPI(
     description="Backend API para Optima AI System Optimizer"
 )
 
-# Start real-time Smart Game Detection watchdog
-game_detector.start_background_monitor()
+@app.on_event("startup")
+def on_startup():
+    # Start real-time Smart Game Detection watchdog after all modules are fully loaded
+    game_detector.start_background_monitor()
 
 # Enable CORS for local desktop UI (Vite / localhost)
 app.add_middleware(
@@ -67,25 +70,18 @@ class ToggleGameDetectorRequest(BaseModel):
 class CustomGameRequest(BaseModel):
     name: str
 
-# Audit log storage
-_execution_logs: List[Dict[str, Any]] = []
-
 def add_log_entry(entry: Dict[str, Any]):
-    import datetime
-    if "timestamp" not in entry or not entry["timestamp"]:
-        entry["timestamp"] = datetime.datetime.now().strftime("%H:%M:%S")
-    _execution_logs.insert(0, entry)
-    if len(_execution_logs) > 200:
-        _execution_logs.pop()
+    audit_logger.add_entry(entry)
 
 @app.get("/api/logs")
 def get_activity_logs():
     """
     Returns full history of optimization decisions, terminations, and memory trims.
     """
+    logs = audit_logger.get_logs()
     return {
-        "logs": _execution_logs,
-        "total_events": len(_execution_logs)
+        "logs": logs,
+        "total_events": len(logs)
     }
 
 @app.delete("/api/logs")
@@ -93,8 +89,7 @@ def clear_activity_logs():
     """
     Clears the in-memory activity logs.
     """
-    global _execution_logs
-    _execution_logs = []
+    audit_logger.clear()
     return {"cleared": True}
 
 @app.get("/api/license/status")

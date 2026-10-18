@@ -160,12 +160,22 @@ KNOWN_GAME_BINARIES: Set[str] = {
     "palworld-win64-shipping.exe",
     "blackmythwukong.exe",
     "b1-win64-shipping.exe",
+    # Xbox Game Pass & GDK titles
+    "maine-wingdk-shipping.exe",
+    "maine.exe",
+    "grounded.exe",
+    "forzahorizon5.exe",
+    "forzahorizon4.exe",
+    "haloinfinite.exe",
+    "seaofthieves.exe",
+    "minecraft.exe",
+    "avowed.exe",
 }
 
 def _has_visible_window(pid: int) -> bool:
     """
-    Checks if the process owns at least one top-level visible window with non-empty title or size.
-    Filters out background services, workers, and invisible helper daemons.
+    Checks if the process owns at least one top-level window.
+    Filters out background services and invisible helper daemons.
     """
     if not sys.platform.startswith("win"):
         return True
@@ -181,10 +191,8 @@ def _has_visible_window(pid: int) -> bool:
                 w_pid = wintypes.DWORD()
                 user32.GetWindowThreadProcessId(hwnd, ctypes.byref(w_pid))
                 if w_pid.value == pid:
-                    length = user32.GetWindowTextLengthW(hwnd)
-                    if length > 0:
-                        found = True
-                        return False
+                    found = True
+                    return False
             return True
 
         WNDENUMPROC = ctypes.WINFUNCTYPE(ctypes.c_bool, wintypes.HWND, wintypes.LPARAM)
@@ -334,10 +342,9 @@ class SmartGameDetector:
             if name in KNOWN_GAME_BINARIES:
                 return True, "Juego Reconocido"
 
-            # 3. Check Unreal Engine / Unity shipping binary patterns
-            if ("shipping.exe" in name or "-win64-shipping" in name or "game_win64" in name):
-                if _has_visible_window(proc.pid):
-                    return True, "Motor de Juego (UE/Unity)"
+            # 3. Check Unreal Engine / Unity / GDK shipping binary patterns
+            if ("shipping.exe" in name or "-win64-shipping" in name or "game_win64" in name or "-wingdk" in name or "wingdk" in name):
+                return True, "Motor de Juego (UE/Unity/GDK)"
 
             # 4. Check folder path against game directories
             try:
@@ -351,10 +358,6 @@ class SmartGameDetector:
                 # Check if it resides in a recognized game library folder
                 for marker in GAME_DIRECTORY_MARKERS:
                     if marker in exe_path:
-                        # Must have a visible desktop window to be considered a playable game
-                        if not _has_visible_window(proc.pid):
-                            return False, ""
-
                         platform = self._identify_platform(exe_path)
                         return True, platform
             except Exception:

@@ -75,9 +75,12 @@ export default function SmartGameBoostCard({
           const data = await res.json();
           setGamingTelemetry(data);
           setOverlayActive(data.overlay_active);
-          if (data.overlay_position) setOverlayPosition(data.overlay_position);
-          if (data.overlay_theme) setOverlayTheme(data.overlay_theme);
-          if (data.overlay_layout) setOverlayLayout(data.overlay_layout);
+          // Do not overwrite local states while user is customizing in the modal
+          if (!isOverlaySettingsOpen) {
+            if (data.overlay_position) setOverlayPosition(data.overlay_position);
+            if (data.overlay_theme) setOverlayTheme(data.overlay_theme);
+            if (data.overlay_layout) setOverlayLayout(data.overlay_layout);
+          }
           if (data.is_benchmarking !== undefined) setIsBenchmarking(data.is_benchmarking);
         }
       } catch (e) {
@@ -91,7 +94,7 @@ export default function SmartGameBoostCard({
       isMounted = false;
       clearInterval(interval);
     };
-  }, []);
+  }, [isOverlaySettingsOpen]);
 
 
   const handleAddGame = async (e) => {
@@ -151,14 +154,28 @@ export default function SmartGameBoostCard({
 
   const handleSaveOverlaySettings = async (cfg) => {
     try {
-      await fetch('/api/gaming/overlay/config', {
+      const res = await fetch('/api/gaming/overlay/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cfg)
       });
-      if (cfg.position) setOverlayPosition(cfg.position);
-      if (cfg.theme) setOverlayTheme(cfg.theme);
-      if (cfg.layout) setOverlayLayout(cfg.layout);
+      const data = await res.json();
+      if (data.success && data.config) {
+        if (cfg.position) setOverlayPosition(cfg.position);
+        if (cfg.theme) setOverlayTheme(cfg.theme);
+        if (cfg.layout) setOverlayLayout(cfg.layout);
+        setGamingTelemetry(prev => prev ? {
+          ...prev,
+          overlay_position: data.config.position,
+          overlay_pos_x: data.config.pos_x,
+          overlay_pos_y: data.config.pos_y,
+          overlay_theme: data.config.theme,
+          overlay_layout: data.config.layout,
+          overlay_hotkey: data.config.overlay_hotkey,
+          benchmark_hotkey: data.config.benchmark_hotkey,
+          sound_enabled: data.config.sound_enabled
+        } : prev);
+      }
     } catch (e) {
       console.warn("Error saving overlay settings:", e);
     }

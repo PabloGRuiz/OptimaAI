@@ -442,6 +442,16 @@ class InGameOverlay:
     def _run_gui(self):
         """Runs the persistent Tk mainloop in this dedicated thread."""
         try:
+            if sys.platform.startswith("win"):
+                try:
+                    import ctypes
+                    ctypes.windll.shcore.SetProcessDpiAwareness(2)
+                except Exception:
+                    try:
+                        ctypes.windll.user32.SetProcessDPIAware()
+                    except Exception:
+                        pass
+
             root = tk.Tk()
             self._root = root
             root.title("OptimaAI In-Game HUD 2.0")

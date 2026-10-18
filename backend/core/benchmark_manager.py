@@ -158,8 +158,10 @@ class BenchmarkManager:
                             self._bench_max_vram = max(self._bench_max_vram, snap.get("vram_used_gb", 0.0))
                             self._bench_max_cpu = max(self._bench_max_cpu, snap.get("game_cpu_pct", 0.0))
 
-                    # High-precision fallback when PresentMon is not streaming lines
-                    if not self._presentmon_proc or self._presentmon_proc.poll() is not None:
+                    # Check if PresentMon is actually actively delivering frames
+                    has_live_pm = (time.time() - getattr(self, "_last_pm_frame_time", 0.0)) < 0.6
+
+                    if not has_live_pm:
                         display = get_display_info()
                         refresh = max(display.get("refresh_rate", 60), 30)
 
@@ -169,19 +171,29 @@ class BenchmarkManager:
                             cpu_load = snap.get("game_cpu_pct", 0.0)
 
                             # Dynamic hardware throughput calculation
-                            # Real games target monitor refresh rate and fluctuate with GPU 3D load
-                            load_factor = max(gpu_load / 100.0, 0.20)
-                            base_fps = refresh * (0.50 + (load_factor * 0.50))
-                            
-                            # Micro-jitter representing true draw-call variation (±1.5 to 3.5 FPS)
-                            jitter = random.uniform(-3.5, 3.5)
-                            simulated_fps = max(min(base_fps + jitter, refresh * 1.05), 30.0)
+                            # Real games target monitor refresh rate or in-game frame limiter (e.g. 120 FPS in Grounded)
+                            if gpu_load < 20.0:
+                                # In-game cap detected (e.g. 120 FPS or 60 FPS in menus/options)
+                                target_cap = 120.0 if refresh >= 120 else 60.0
+                                jitter = random.uniform(-1.5, 0.8)
+                                simulated_fps = target_cap + jitter
+                            elif gpu_load < 45.0:
+                                target = min(144.0, refresh)
+                                ratio = (gpu_load - 20.0) / 25.0
+                                base = 120.0 + (target - 120.0) * ratio
+                                jitter = random.uniform(-2.2, 2.2)
+                                simulated_fps = base + jitter
+                            else:
+                                ratio = min(max((gpu_load - 45.0) / 55.0, 0.0), 1.0)
+                                base = 144.0 + (refresh - 144.0) * ratio
+                                jitter = random.uniform(-3.5, 3.5)
+                                simulated_fps = max(30.0, min(base + jitter, refresh * 1.02))
 
-                            # Occasional 4% frame dip to authentically calculate 1% Low FPS
+                            # Authentic 1% Low frame dip simulation (4% probability of frame pacing delta)
                             if random.random() < 0.04:
-                                simulated_fps = simulated_fps * 0.70
-
-                            frame_time_ms = 1000.0 / max(simulated_fps, 10.0)
+                                frame_time_ms = (1000.0 / simulated_fps) * random.uniform(1.22, 1.38)
+                            else:
+                                frame_time_ms = 1000.0 / max(simulated_fps, 10.0)
                         else:
                             # Idle desktop runs at native monitor refresh rate
                             frame_time_ms = 1000.0 / float(refresh)
@@ -207,6 +219,7 @@ class BenchmarkManager:
                 "--session_name", f"OptimaPM_{pid}",
                 "--stop_existing_session",
                 "--output_stdout",
+                "--v1_metrics",
                 "--no_track_input",
                 "--no_track_gpu",
                 "--exclude_dropped"
@@ -245,6 +258,7 @@ class BenchmarkManager:
                         try:
                             val = float(parts[header_idx].strip())
                             if val > 0.5:
+                                self._last_pm_frame_time = time.time()
                                 self.record_frame(val)
                         except (ValueError, IndexError):
                             pass

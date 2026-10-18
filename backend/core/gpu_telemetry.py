@@ -149,32 +149,23 @@ class GpuTelemetryManager:
 
             # 3. Read Active Game Stats if game is running
             from backend.core.game_detector import game_detector
+            from backend.core.benchmark_manager import benchmark_manager
             active = game_detector.active_game
             game_cpu = 0.0
             game_ram = 0.0
-            fps_val = 60
 
             if active and active.pid > 0:
                 try:
                     p = psutil.Process(active.pid)
                     game_cpu = p.cpu_percent()
                     game_ram = round(p.memory_info().rss / (1024 * 1024), 1)
-                    
-                    # Dynamically calculate FPS based on frame cadence & GPU workload
-                    now = time.time()
-                    elapsed = now - self._last_frame_calc
-                    if elapsed > 0:
-                        # Baseline estimation calibrated to active 3D GPU load
-                        load_ratio = min(max(gpu_sum / 100.0, 0.15), 1.0)
-                        # Realistic game FPS scale
-                        base_fps = int(60 + (load_ratio * 105))
-                        fps_val = min(base_fps, 240)
-                        self._last_frame_calc = now
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     pass
-            else:
-                # Desktop idle
-                fps_val = 60 if gpu_sum < 10 else int(60 + (gpu_sum * 0.8))
+
+            # Read authentic frame delivery metrics from Benchmark Manager
+            live_bench = benchmark_manager.get_live_metrics()
+            fps_val = live_bench.get("instant_fps", 60)
+            one_pct_val = live_bench.get("one_percent_low", 60)
 
             with self._lock:
                 self._last_gpu_usage = min(round(gpu_sum, 1), 100.0)
@@ -182,6 +173,7 @@ class GpuTelemetryManager:
                 self._last_game_cpu = round(game_cpu, 1)
                 self._last_game_ram_mb = game_ram
                 self._last_fps = fps_val
+                self._last_one_percent_low = one_pct_val
                 self._last_update_time = time.time()
 
         pdh.PdhCloseQuery(hQuery)
@@ -198,9 +190,11 @@ class GpuTelemetryManager:
                 "vram_used_gb": round(self._last_vram_used / 1024, 2),
                 "vram_total_gb": round(self.vram_total_mb / 1024, 1),
                 "fps": self._last_fps,
+                "one_percent_low": getattr(self, "_last_one_percent_low", 60),
                 "game_cpu_pct": self._last_game_cpu,
                 "game_ram_mb": self._last_game_ram_mb,
                 "timestamp": time.time()
             }
+
 
 gpu_telemetry = GpuTelemetryManager()

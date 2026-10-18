@@ -75,6 +75,8 @@ def build_executable():
         "--hidden-import=backend.core.telemetry",
         "--hidden-import=backend.core.gpu_telemetry",
         "--hidden-import=backend.core.game_overlay",
+        "--hidden-import=backend.core.benchmark_manager",
+        "--hidden-import=backend.core.updater",
         "--hidden-import=backend.core.ollama_client",
         "--hidden-import=backend.core.ollama_manager",
         "--hidden-import=uvicorn",

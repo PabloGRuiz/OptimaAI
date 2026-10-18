@@ -15,9 +15,17 @@ import {
   Cpu,
   Flame,
   Gauge,
-  EyeOff
+  EyeOff,
+  History,
+  Palette,
+  Maximize2,
+  Minimize2,
+  X,
+  Clock,
+  ChevronRight
 } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
+import BenchmarkReportModal from './BenchmarkReportModal';
 
 export default function SmartGameBoostCard({
   detectorStatus,
@@ -33,9 +41,20 @@ export default function SmartGameBoostCard({
   const [newGameInput, setNewGameInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [gamingTelemetry, setGamingTelemetry] = useState(null);
+  
+  // HUD 2.0 State
   const [overlayActive, setOverlayActive] = useState(false);
   const [overlayPosition, setOverlayPosition] = useState('top-right');
+  const [overlayTheme, setOverlayTheme] = useState('cyan');
+  const [overlayLayout, setOverlayLayout] = useState('full');
   const [overlayLoading, setOverlayLoading] = useState(false);
+
+  // Benchmark Pro State
+  const [isBenchmarking, setIsBenchmarking] = useState(false);
+  const [latestReport, setLatestReport] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [benchmarkHistory, setBenchmarkHistory] = useState([]);
 
   const isPro = detectorStatus?.is_pro;
   const isEnabled = detectorStatus?.enabled;
@@ -53,9 +72,10 @@ export default function SmartGameBoostCard({
           const data = await res.json();
           setGamingTelemetry(data);
           setOverlayActive(data.overlay_active);
-          if (data.overlay_position) {
-            setOverlayPosition(data.overlay_position);
-          }
+          if (data.overlay_position) setOverlayPosition(data.overlay_position);
+          if (data.overlay_theme) setOverlayTheme(data.overlay_theme);
+          if (data.overlay_layout) setOverlayLayout(data.overlay_layout);
+          if (data.is_benchmarking !== undefined) setIsBenchmarking(data.is_benchmarking);
         }
       } catch (e) {
         // silent
@@ -63,12 +83,13 @@ export default function SmartGameBoostCard({
     };
 
     fetchTelemetry();
-    const interval = setInterval(fetchTelemetry, 1500);
+    const interval = setInterval(fetchTelemetry, 1200);
     return () => {
       isMounted = false;
       clearInterval(interval);
     };
   }, []);
+
 
   const handleAddGame = async (e) => {
     e.preventDefault();
@@ -103,20 +124,57 @@ export default function SmartGameBoostCard({
     }
   };
 
-  const handlePositionChange = async (newPos) => {
-    setOverlayPosition(newPos);
-    if (overlayActive && isPro) {
+  const handleUpdateOverlayConfig = async (newPos, newTheme, newLayout) => {
+    const pos = newPos || overlayPosition;
+    const theme = newTheme || overlayTheme;
+    const layout = newLayout || overlayLayout;
+
+    if (newPos) setOverlayPosition(newPos);
+    if (newTheme) setOverlayTheme(newTheme);
+    if (newLayout) setOverlayLayout(newLayout);
+
+    if (isPro) {
       try {
-        await fetch('/api/gaming/overlay/toggle', {
+        await fetch('/api/gaming/overlay/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ enabled: true, position: newPos })
+          body: JSON.stringify({ position: pos, theme: theme, layout: layout })
         });
       } catch (e) {
         // silent
       }
     }
   };
+
+  const handleToggleBenchmark = async () => {
+    try {
+      const res = await fetch('/api/benchmark/toggle', { method: 'POST' });
+      const data = await res.json();
+      if (data.active !== undefined) {
+        setIsBenchmarking(data.active);
+      }
+      if (data.active === false && data.report) {
+        setLatestReport(data.report);
+        setIsReportModalOpen(true);
+      }
+    } catch (e) {
+      console.warn("Error toggling benchmark:", e);
+    }
+  };
+
+  const handleFetchHistory = async () => {
+    try {
+      const res = await fetch('/api/benchmark/history');
+      if (res.ok) {
+        const data = await res.json();
+        setBenchmarkHistory(data.history || []);
+        setShowHistory(true);
+      }
+    } catch (e) {
+      console.warn("Error fetching history:", e);
+    }
+  };
+
 
   const vramUsedGb = gamingTelemetry?.vram_used_gb || 0;
   const vramTotalGb = gamingTelemetry?.vram_total_gb || 8;
@@ -274,13 +332,13 @@ export default function SmartGameBoostCard({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          {/* Tile 1: FPS */}
+          {/* Tile 1: Authentic FPS */}
           <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-400 text-[11px]">
               <span className="font-semibold flex items-center gap-1">
                 <Gauge className="h-3 w-3 text-emerald-400" /> {t('smartGameBoost', 'fps')}
               </span>
-              <span className="text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">{t('smartGameBoost', 'fpsBadge')}</span>
+              <span className="text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">DXGI/ETW</span>
             </div>
             <div className="mt-1 flex items-baseline gap-1">
               <span className="text-xl font-extrabold text-emerald-400 font-mono">
@@ -290,62 +348,82 @@ export default function SmartGameBoostCard({
             </div>
           </div>
 
-          {/* Tile 2: GPU 3D Load */}
+          {/* Tile 2: 1% Low FPS (Real Stability Metric) */}
           <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-400 text-[11px]">
               <span className="font-semibold flex items-center gap-1">
-                <Flame className="h-3 w-3 text-cyan-400" /> {t('smartGameBoost', 'gpuLoad')}
+                <Activity className="h-3 w-3 text-cyan-400" /> {t('benchmark', 'onePercentLow', '1% Low FPS')}
               </span>
-              <span className="text-[9px] font-mono text-cyan-400 font-bold">{gpuLoad}%</span>
+              <span className="text-[9px] uppercase tracking-wider text-cyan-400/80 font-bold">P99 Cadence</span>
+            </div>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="text-xl font-extrabold text-cyan-300 font-mono">
+                {activeGame ? (gamingTelemetry?.one_percent_low || 60) : 60}
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">fps</span>
+            </div>
+          </div>
+
+          {/* Tile 3: GPU 3D Load & VRAM */}
+          <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
+            <div className="flex items-center justify-between text-slate-400 text-[11px]">
+              <span className="font-semibold flex items-center gap-1">
+                <Flame className="h-3 w-3 text-amber-400" /> {t('smartGameBoost', 'gpuLoad')}
+              </span>
+              <span className="text-[9px] font-mono text-purple-300 font-bold">{vramUsedGb}G / {vramTotalGb}G</span>
             </div>
             <div className="mt-1.5">
+              <div className="flex items-center justify-between text-[11px] font-mono text-slate-300 mb-1">
+                <span>GPU {gpuLoad}%</span>
+                <span>VRAM {vramPercent}%</span>
+              </div>
               <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-500 h-full rounded-full transition-all duration-500"
                   style={{ width: `${gpuLoad}%` }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Tile 3: VRAM */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
+          {/* Tile 4: Benchmark Controller CTA */}
+          <div className="bg-slate-900/90 border border-indigo-500/30 rounded-lg p-2.5 flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-400 text-[11px]">
-              <span className="font-semibold flex items-center gap-1">
-                <Layers className="h-3 w-3 text-purple-400" /> {t('smartGameBoost', 'vramUsage')}
+              <span className="font-semibold text-white flex items-center gap-1">
+                <Zap className="h-3 w-3 text-yellow-400" /> Benchmark Pro
               </span>
-              <span className="text-[9px] font-mono text-purple-400 font-bold">{vramPercent}%</span>
+              <button
+                onClick={handleFetchHistory}
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5"
+              >
+                <History className="h-2.5 w-2.5" /> {t('smartGameBoost', 'benchHistoryBtn', 'Historial')}
+              </button>
             </div>
-            <div className="mt-1 flex items-baseline gap-1 text-[11px] font-mono text-slate-200">
-              <span className="font-bold text-purple-300">{vramUsedGb} GB</span>
-              <span className="text-slate-500">/ {vramTotalGb} GB</span>
-            </div>
-          </div>
 
-          {/* Tile 4: Game CPU / RAM */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-slate-400 text-[11px]">
-              <span className="font-semibold flex items-center gap-1">
-                <Cpu className="h-3 w-3 text-rose-400" /> {t('smartGameBoost', 'gameMemory')}
+            <button
+              onClick={handleToggleBenchmark}
+              className={`mt-1.5 w-full py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md ${
+                isBenchmarking
+                  ? 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-600 text-white animate-pulse shadow-rose-600/30'
+                  : 'bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white shadow-indigo-600/20'
+              }`}
+            >
+              <span className={`h-2 w-2 rounded-full ${isBenchmarking ? 'bg-white' : 'bg-red-400'}`} />
+              <span>
+                {isBenchmarking
+                  ? `${t('smartGameBoost', 'stopBenchBtn', 'Detener')} (${Math.floor((gamingTelemetry?.benchmark_elapsed_sec || 0) / 60)}:${Math.floor((gamingTelemetry?.benchmark_elapsed_sec || 0) % 60).toString().padStart(2, '0')})`
+                  : t('smartGameBoost', 'startBenchBtn', 'Grabar Benchmark (F11)')}
               </span>
-              <span className="text-[9px] font-mono text-rose-400 font-bold">
-                {activeGame ? `${gamingTelemetry?.game_cpu_pct || 0}% CPU` : '--'}
-              </span>
-            </div>
-            <div className="mt-1 flex items-baseline gap-1 text-[11px] font-mono text-slate-200">
-              <span className="font-bold text-rose-300">
-                {activeGame ? `${gamingTelemetry?.game_ram_mb || 0} MB` : '0 MB'}
-              </span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* PRO EXCLUSIVE: IN-GAME OVERLAY CONTROL BAR */}
-      <div className="relative z-10 p-3.5 rounded-xl bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-purple-950/40 border border-purple-500/30 flex items-center justify-between flex-wrap gap-3">
+      {/* PRO EXCLUSIVE: IN-GAME OVERLAY 2.0 CONTROL BAR */}
+      <div className="relative z-10 p-3.5 rounded-xl bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-purple-950/40 border border-purple-500/30 flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-purple-600/30 border border-purple-500/40 flex items-center justify-center text-purple-300">
-            <Monitor className="h-4 w-4" />
+          <div className="h-9 w-9 rounded-xl bg-purple-600/30 border border-purple-500/40 flex items-center justify-center text-purple-300 shadow-md">
+            <Monitor className="h-4.5 w-4.5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -366,24 +444,97 @@ export default function SmartGameBoostCard({
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Position Selector */}
-          <div className="flex items-center bg-slate-900/80 border border-slate-700/60 rounded-lg p-0.5 text-[11px]">
+        <div className="flex items-center flex-wrap gap-2.5">
+          {/* 4-Position Selector */}
+          <div className="flex items-center bg-slate-900/80 border border-slate-700/60 rounded-lg p-0.5 text-[10px]">
             <button
-              onClick={() => handlePositionChange('top-left')}
-              className={`px-2 py-0.5 rounded ${
+              onClick={() => handleUpdateOverlayConfig('top-left')}
+              title="Superior Izquierda"
+              className={`px-1.5 py-1 rounded ${
                 overlayPosition === 'top-left' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              {t('smartGameBoost', 'topLeft')}
+              ↖ {t('smartGameBoost', 'topLeft')}
             </button>
             <button
-              onClick={() => handlePositionChange('top-right')}
-              className={`px-2 py-0.5 rounded ${
+              onClick={() => handleUpdateOverlayConfig('top-right')}
+              title="Superior Derecha"
+              className={`px-1.5 py-1 rounded ${
                 overlayPosition === 'top-right' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              {t('smartGameBoost', 'topRight')}
+              ↗ {t('smartGameBoost', 'topRight')}
+            </button>
+            <button
+              onClick={() => handleUpdateOverlayConfig('bottom-left')}
+              title="Inferior Izquierda"
+              className={`px-1.5 py-1 rounded ${
+                overlayPosition === 'bottom-left' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              ↙ {t('smartGameBoost', 'bottomLeft', 'Inf-Izq')}
+            </button>
+            <button
+              onClick={() => handleUpdateOverlayConfig('bottom-right')}
+              title="Inferior Derecha"
+              className={`px-1.5 py-1 rounded ${
+                overlayPosition === 'bottom-right' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              ↘ {t('smartGameBoost', 'bottomRight', 'Inf-Der')}
+            </button>
+          </div>
+
+          {/* Theme Selector */}
+          <div className="flex items-center bg-slate-900/80 border border-slate-700/60 rounded-lg p-0.5 text-[10px]">
+            <button
+              onClick={() => handleUpdateOverlayConfig(null, 'cyberpunk')}
+              className={`px-2 py-1 rounded flex items-center gap-1 ${
+                overlayTheme === 'cyberpunk' ? 'bg-emerald-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span>Cyber</span>
+            </button>
+            <button
+              onClick={() => handleUpdateOverlayConfig(null, 'cyan')}
+              className={`px-2 py-1 rounded flex items-center gap-1 ${
+                overlayTheme === 'cyan' ? 'bg-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+              <span>Cyan</span>
+            </button>
+            <button
+              onClick={() => handleUpdateOverlayConfig(null, 'violet')}
+              className={`px-2 py-1 rounded flex items-center gap-1 ${
+                overlayTheme === 'violet' ? 'bg-purple-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-purple-400" />
+              <span>Violet</span>
+            </button>
+          </div>
+
+          {/* Compact / Full Layout Mode */}
+          <div className="flex items-center bg-slate-900/80 border border-slate-700/60 rounded-lg p-0.5 text-[10px]">
+            <button
+              onClick={() => handleUpdateOverlayConfig(null, null, 'full')}
+              className={`px-2 py-1 rounded flex items-center gap-1 ${
+                overlayLayout === 'full' ? 'bg-slate-700 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Maximize2 className="h-2.5 w-2.5" />
+              <span>Full</span>
+            </button>
+            <button
+              onClick={() => handleUpdateOverlayConfig(null, null, 'compact')}
+              className={`px-2 py-1 rounded flex items-center gap-1 ${
+                overlayLayout === 'compact' ? 'bg-slate-700 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Minimize2 className="h-2.5 w-2.5" />
+              <span>Mini</span>
             </button>
           </div>
 
@@ -412,6 +563,7 @@ export default function SmartGameBoostCard({
           )}
         </div>
       </div>
+
 
       {/* Custom Game Management Panel (Collapsible) */}
       {showConfig && (
@@ -506,6 +658,84 @@ export default function SmartGameBoostCard({
           </div>
         </div>
       )}
+
+      {/* Benchmark History Modal */}
+      {showHistory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-lg bg-slate-900 border border-indigo-500/40 rounded-2xl p-5 shadow-2xl text-slate-100 max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <History className="h-5 w-5 text-indigo-400" />
+                <h3 className="text-sm font-bold text-white">
+                  {t('benchmark', 'historyTitle', 'Historial de Benchmarks')}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowHistory(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto py-3 space-y-2.5 pr-1">
+              {benchmarkHistory.length === 0 ? (
+                <div className="text-center py-8 text-slate-500">
+                  <Activity className="h-8 w-8 mx-auto mb-2 opacity-40 text-slate-400" />
+                  <p className="text-xs">No hay benchmarks registrados aún.</p>
+                  <p className="text-[11px] text-slate-600 mt-1">Presiona F11 o el botón Grabar mientras juegas.</p>
+                </div>
+              ) : (
+                benchmarkHistory.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-indigo-500/40 transition-all flex items-center justify-between gap-3 group"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-cyan-300 font-mono">
+                          {item.game_name}
+                        </span>
+                        <span className="text-[10px] text-slate-500">
+                          {item.created_at}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1 text-[11px] font-mono">
+                        <span className="text-emerald-400 font-bold">
+                          Avg: {item.avg_fps} fps
+                        </span>
+                        <span className="text-cyan-400">
+                          1% Low: {item.one_percent_low_fps} fps
+                        </span>
+                        <span className="text-slate-400">
+                          Stutter: {item.stutter_rate_pct}%
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setLatestReport(item);
+                        setIsReportModalOpen(true);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-1"
+                    >
+                      <span>Ver</span>
+                      <ChevronRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Benchmark Report Modal */}
+      <BenchmarkReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        report={latestReport}
+      />
 
     </div>
   );

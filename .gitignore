@@ -41,6 +41,7 @@ pnpm-debug.log*
 # PyInstaller / Build Artifacts
 *.manifest
 *.spec
+*.csv
 
 # IDEs & System
 .vscode/

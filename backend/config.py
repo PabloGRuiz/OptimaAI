@@ -117,7 +117,8 @@ class SecurityConfig(BaseModel):
 
 class AppSettings(BaseModel):
     app_name: str = "OptimaAI"
-    version: str = "1.2.0"
+    version: str = "1.3.0"
+    app_data_dir: Path = Field(default_factory=lambda: Path(os.environ.get("LOCALAPPDATA", ".")) / "OptimaAI")
     ollama: OllamaConfig = Field(default_factory=OllamaConfig)
     telemetry: TelemetryConfig = Field(default_factory=TelemetryConfig)
     security: SecurityConfig = Field(default_factory=SecurityConfig)

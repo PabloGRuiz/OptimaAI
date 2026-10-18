@@ -28,6 +28,8 @@ from backend.core.audit_logger import audit_logger
 from backend.core.gpu_telemetry import gpu_telemetry
 from backend.core.game_overlay import game_overlay
 from backend.core.updater import update_manager
+from backend.core.benchmark_manager import benchmark_manager
+
 
 app = FastAPI(
     title=settings.app_name,
@@ -77,6 +79,14 @@ class CustomGameRequest(BaseModel):
 class ToggleOverlayRequest(BaseModel):
     enabled: bool
     position: Optional[str] = "top-right"
+
+class OverlayConfigRequest(BaseModel):
+    position: Optional[str] = None
+    theme: Optional[str] = None
+    layout: Optional[str] = None
+
+class StartBenchmarkRequest(BaseModel):
+    game_name: Optional[str] = None
 
 class IgnoreProcessRequest(BaseModel):
     name: str
@@ -182,17 +192,30 @@ def unignore_process_target(req: IgnoreProcessRequest):
 @app.get("/api/gaming/telemetry")
 def get_gaming_telemetry():
     """
-    Returns live cross-vendor GPU, VRAM, CPU, RAM, and FPS telemetry.
+    Returns live cross-vendor GPU, VRAM, CPU, RAM, and authentic FPS telemetry.
     Available to all users inside the app.
     """
     snap = gpu_telemetry.get_snapshot()
     lic = license_manager.get_status()
     active = game_detector.active_game
+    bench = benchmark_manager.get_live_metrics()
+    overlay_conf = game_overlay.get_config()
+
     snap["is_pro"] = lic.is_pro
     snap["overlay_active"] = game_overlay.is_active
     snap["auto_overlay"] = game_detector.auto_overlay
-    snap["overlay_position"] = game_overlay.position
+    snap["overlay_position"] = overlay_conf["position"]
+    snap["overlay_theme"] = overlay_conf["theme"]
+    snap["overlay_layout"] = overlay_conf["layout"]
     snap["active_game"] = active.model_dump() if active else None
+
+    # Benchmark metrics
+    snap["fps"] = bench["instant_fps"]
+    snap["one_percent_low"] = bench["one_percent_low"]
+    snap["avg_fps"] = bench["avg_fps"]
+    snap["is_benchmarking"] = bench["is_benchmarking"]
+    snap["benchmark_elapsed_sec"] = bench["benchmark_elapsed_sec"]
+    snap["sparkline_frame_times"] = bench["sparkline_frame_times"]
     return snap
 
 @app.post("/api/gaming/overlay/toggle")
@@ -223,6 +246,55 @@ def toggle_gaming_overlay(req: ToggleOverlayRequest):
         "position": game_overlay.position,
         "auto_overlay": game_detector.auto_overlay
     }
+
+@app.post("/api/gaming/overlay/config")
+def update_overlay_configuration(req: OverlayConfigRequest):
+    """
+    Updates the position, theme, or layout mode of the in-game HUD.
+    """
+    lic = license_manager.get_status()
+    if not lic.is_pro:
+        return {"success": False, "is_pro": False, "message": "Pro required"}
+    cfg = game_overlay.update_config(position=req.position, theme=req.theme, layout=req.layout)
+    return {"success": True, "config": cfg}
+
+@app.get("/api/benchmark/status")
+def get_benchmark_live_status():
+    """
+    Returns live FPS, 1% Low, sparkline and benchmark state.
+    """
+    return benchmark_manager.get_live_metrics()
+
+@app.post("/api/benchmark/start")
+def start_benchmark_session(req: Optional[StartBenchmarkRequest] = None):
+    """
+    Starts an in-game benchmark recording session.
+    """
+    game_name = req.game_name if req else None
+    return benchmark_manager.start_benchmark(game_name=game_name)
+
+@app.post("/api/benchmark/stop")
+def stop_benchmark_session():
+    """
+    Stops the benchmark session and returns detailed report with 1% Low & Avg FPS.
+    """
+    rep = benchmark_manager.stop_benchmark()
+    return {"success": True, "report": rep.model_dump() if rep else None}
+
+@app.post("/api/benchmark/toggle")
+def toggle_benchmark_session():
+    """
+    Toggles benchmark session on/off.
+    """
+    return benchmark_manager.toggle_benchmark()
+
+@app.get("/api/benchmark/history")
+def get_benchmark_history():
+    """
+    Returns list of saved benchmark session reports.
+    """
+    return {"history": benchmark_manager.get_history()}
+
 
 @app.get("/api/health")
 def get_health():

@@ -54,3 +54,7 @@ Thumbs.db
 admin_keygen/
 tools/*.exe
 *.log
+
+# HyperFrames Video & Cache
+promo-video/.hyperframes/
+*.mp4

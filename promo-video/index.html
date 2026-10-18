@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="es" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>OptimaAI - Video Promocional</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
+    <!-- GSAP for seekable timeline rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #06080d;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        color: #f8fafc;
+      }
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 30%, #111827 0%, #06080d 75%, #030406 100%);
+      }
+      .clip {
+        position: absolute;
+        box-sizing: border-box;
+      }
+      .scene {
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 100px;
+        pointer-events: none;
+      }
+      /* Tech Grid Backdrop */
+      .bg-grid {
+        position: absolute;
+        inset: 0;
+        background-size: 64px 64px;
+        background-image: 
+          linear-gradient(to right, rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+        mask-image: radial-gradient(ellipse at 50% 50%, black 50%, transparent 85%);
+      }
+      .glow-orb {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(140px);
+        opacity: 0.35;
+        pointer-events: none;
+      }
+      /* Glass Panels */
+      .glass-card {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(99, 102, 241, 0.12);
+        border-radius: 20px;
+      }
+      .glass-card-pro {
+        background: rgba(20, 18, 10, 0.85);
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 40px rgba(245, 158, 11, 0.18);
+        border-radius: 20px;
+      }
+      /* Glow Text */
+      .text-glow-indigo {
+        text-shadow: 0 0 35px rgba(129, 140, 248, 0.7);
+      }
+      .text-glow-amber {
+        text-shadow: 0 0 35px rgba(251, 191, 36, 0.7);
+      }
+      .text-glow-emerald {
+        text-shadow: 0 0 35px rgba(52, 211, 153, 0.7);
+      }
+      .text-glow-rose {
+        text-shadow: 0 0 35px rgba(251, 113, 133, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="28"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Background Ambient Grid & Lights -->
+      <div class="bg-grid"></div>
+      <div id="orb-blue" class="glow-orb" style="top: 15%; left: 25%; width: 550px; height: 550px; background: #4f46e5;"></div>
+      <div id="orb-purple" class="glow-orb" style="bottom: 15%; right: 25%; width: 550px; height: 550px; background: #9333ea;"></div>
+      <div id="orb-amber" class="glow-orb" style="top: 35%; right: 35%; width: 450px; height: 450px; background: #d97706; opacity: 0;"></div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 1: EL PROBLEMA (0s - 5.5s)                        -->
+      <!-- ======================================================== -->
+      <div id="scene-1" class="clip scene" data-start="0" data-duration="5.5" data-track-index="0" data-layout-allow-overlap>
+        
+        <!-- Top Pill -->
+        <div id="s1-pill" style="margin-bottom: 24px;">
+          <div style="display: flex; align-items: center; gap: 12px; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(251, 113, 133, 0.5); padding: 8px 24px; border-radius: 9999px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fb7185" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span class="mono" style="font-size: 14px; font-weight: 800; color: #ffe4e6; letter-spacing: 0.1em; text-transform: uppercase;">Colapso de Recursos en Windows</span>
+          </div>
+        </div>
+
+        <!-- Main Question -->
+        <h1 id="s1-title" style="font-size: 60px; font-weight: 900; line-height: 1.2; text-align: center; max-width: 1400px; margin-bottom: 45px; color: #ffffff;">
+          ¿Tu PC sufre <span style="color: #fb7185;" class="text-glow-rose">tirones, caídas de FPS</span><br/>y memoria RAM saturada al jugar?
+        </h1>
+
+        <!-- 3 Problem Cards -->
+        <div id="s1-cards" style="display: flex; gap: 28px; width: 1350px; justify-content: center;">
+          
+          <!-- Card 1 -->
+          <div class="glass-card" style="flex: 1; padding: 32px 28px; border-color: rgba(251, 113, 133, 0.4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <span class="mono" style="font-size: 13px; color: #cbd5e1; font-weight: 800;">MEMORIA FÍSICA</span>
+              <span style="background: rgba(244, 63, 94, 0.25); color: #ffe4e6; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 800;">89% LLENO</span>
+            </div>
+            <div class="mono" style="font-size: 42px; font-weight: 900; color: #fb7185; margin-bottom: 10px;">14.2 / 16 GB</div>
+            <p style="color: #cbd5e1; font-size: 15px; line-height: 1.5;">Procesos inactivos retienen memoria física que asfixia tus juegos y programas.</p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="glass-card" style="flex: 1; padding: 32px 28px; border-color: rgba(251, 113, 133, 0.4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <span class="mono" style="font-size: 13px; color: #cbd5e1; font-weight: 800;">APPS DE FONDO</span>
+              <span style="background: rgba(244, 63, 94, 0.25); color: #ffe4e6; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 800;">CPU ROBADA</span>
+            </div>
+            <div class="mono" style="font-size: 42px; font-weight: 900; color: #fb7185; margin-bottom: 10px;">24 Tareas Activas</div>
+            <p style="color: #cbd5e1; font-size: 15px; line-height: 1.5;">Launchers, navegadores y Discord compitiendo por los núcleos de tu CPU.</p>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="glass-card" style="flex: 1; padding: 32px 28px; border-color: rgba(251, 113, 133, 0.4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <span class="mono" style="font-size: 13px; color: #cbd5e1; font-weight: 800;">MICRO-STUTTERS</span>
+              <span style="background: rgba(244, 63, 94, 0.25); color: #ffe4e6; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 800;">1% LOWS</span>
+            </div>
+            <div class="mono" style="font-size: 42px; font-weight: 900; color: #fb7185; margin-bottom: 10px;">38 FPS Mínimos</div>
+            <p style="color: #cbd5e1; font-size: 15px; line-height: 1.5;">Caídas bruscas de fotogramas justo en los momentos más intensos de la partida.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 2: LA SOLUCIÓN OPTIMAAI (5.5s - 11.5s)            -->
+      <!-- ======================================================== -->
+      <div id="scene-2" class="clip scene" data-start="5.5" data-duration="6.0" data-track-index="0" style="opacity: 0;" data-layout-allow-overlap>
+        
+        <!-- Big Brand Intro -->
+        <div id="s2-logo" style="display: flex; align-items: center; gap: 24px; margin-bottom: 25px;">
+          <div style="width: 80px; height: 80px; border-radius: 22px; background: linear-gradient(135deg, #4f46e5, #06b6d4); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px rgba(99, 102, 241, 0.6);">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 72px; font-weight: 900; letter-spacing: -0.03em; line-height: 1; color: #ffffff;">
+              Optima<span style="color: #a5b4fc;" class="text-glow-indigo">AI</span>
+            </div>
+            <div style="font-size: 18px; color: #cbd5e1; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px;">
+              Desktop Performance Analyzer & Gaming Booster
+            </div>
+          </div>
+        </div>
+
+        <p id="s2-desc" style="font-size: 26px; color: #e2e8f0; max-width: 1100px; text-align: center; margin-bottom: 45px; line-height: 1.4;">
+          La combinación definitiva entre <strong style="color: #67e8f9;">IA Local en GPU</strong> y un <strong style="color: #c084fc;">Motor Heurístico Autónomo</strong> de latencia cero.
+        </p>
+
+        <!-- Feature Pills Grid -->
+        <div id="s2-features" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 1300px;">
+          
+          <div class="glass-card" style="padding: 24px; display: flex; align-items: center; gap: 16px;">
+            <div style="background: rgba(99, 102, 241, 0.25); border-radius: 12px; padding: 12px; color: #a5b4fc;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 18px; font-weight: 800; color: #ffffff;">IA Local Ollama</div>
+              <div style="font-size: 14px; color: #cbd5e1;">Llama 3.2 acelerado en VRAM</div>
+            </div>
+          </div>
+
+          <div class="glass-card" style="padding: 24px; display: flex; align-items: center; gap: 16px;">
+            <div style="background: rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 12px; color: #6ee7b7;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 18px; font-weight: 800; color: #ffffff;">Heurística Sub-20ms</div>
+              <div style="font-size: 14px; color: #cbd5e1;">Optimización matemática instantánea</div>
+            </div>
+          </div>
+
+          <div class="glass-card" style="padding: 24px; display: flex; align-items: center; gap: 16px;">
+            <div style="background: rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 12px; color: #67e8f9;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 18px; font-weight: 800; color: #ffffff;">100% Portable .exe</div>
+              <div style="font-size: 14px; color: #cbd5e1;">Cero dependencias • Solo 39 MB</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 3: SMART GAME BOOST EN ACCIÓN (11.5s - 17.5s)     -->
+      <!-- ======================================================== -->
+      <div id="scene-3" class="clip scene" data-start="11.5" data-duration="6.0" data-track-index="0" style="opacity: 0;" data-layout-allow-overlap>
+        
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+          <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(52, 211, 153, 0.5); padding: 6px 18px; border-radius: 9999px; font-size: 13px; font-weight: 800; color: #a7f3d0; letter-spacing: 0.1em; text-transform: uppercase;">
+            🎮 Smart Game Detection & Auto-Boost
+          </span>
+        </div>
+
+        <h2 style="font-size: 50px; font-weight: 900; text-align: center; margin-bottom: 30px; color: #ffffff;">
+          Tu juego se inicia. <span style="color: #6ee7b7;" class="text-glow-emerald">OptimaAI hace el resto.</span>
+        </h2>
+
+        <!-- Active Simulation Dashboard -->
+        <div class="glass-card" style="width: 1350px; padding: 36px; border-color: rgba(52, 211, 153, 0.4);">
+          
+          <!-- Game Running Banner -->
+          <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 14px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="width: 14px; height: 14px; border-radius: 50%; background: #34d399; box-shadow: 0 0 15px #34d399;"></div>
+              <div>
+                <span class="mono" style="font-size: 12px; font-weight: 800; color: #a7f3d0; text-transform: uppercase;">JUEGO ACTIVO DETECTADO</span>
+                <div style="font-size: 24px; font-weight: 900; color: #ffffff;">Counter-Strike 2 (cs2.exe) • Steam</div>
+              </div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.25); color: #ecfdf5; padding: 6px 16px; border-radius: 8px; font-weight: 800; font-size: 13px; border: 1px solid rgba(52, 211, 153, 0.4);">
+              PRIORIDAD ALTA ACTIVADA
+            </div>
+          </div>
+
+          <!-- 2 Columns: RAM Sweep + Throttling -->
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: center;">
+            
+            <!-- RAM Before/After Dynamic Counter -->
+            <div>
+              <div style="font-size: 14px; font-weight: 800; color: #cbd5e1; margin-bottom: 8px;">VACIADO PROFUNDO DE MEMORIA (EmptyWorkingSet)</div>
+              <div style="display: flex; align-items: baseline; gap: 20px; margin-bottom: 14px;">
+                <span id="s3-ram-text" class="mono" style="font-size: 60px; font-weight: 900; color: #6ee7b7;">14.2 GB</span>
+                <span style="font-size: 24px; color: #94a3b8;">➔</span>
+                <span id="s3-freed-badge" class="mono" style="font-size: 30px; font-weight: 800; color: #67e8f9;">+8,400 MB LIBERADOS</span>
+              </div>
+
+              <!-- Bar graph -->
+              <div style="width: 100%; height: 18px; background: rgba(255, 255, 255, 0.1); border-radius: 9px; overflow: hidden;">
+                <div id="s3-ram-bar" style="height: 100%; width: 88%; background: linear-gradient(90deg, #10b981, #06b6d4); border-radius: 9px;"></div>
+              </div>
+            </div>
+
+            <!-- Throttled Apps List -->
+            <div style="background: rgba(0, 0, 0, 0.4); border-radius: 14px; padding: 18px; border: 1px solid rgba(255, 255, 255, 0.1);">
+              <div class="mono" style="font-size: 12px; font-weight: 800; color: #cbd5e1; margin-bottom: 10px;">THROTTLING INTELIGENTE A 'IDLE_PRIORITY'</div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #e2e8f0;">
+                  <span>chrome.exe (18 pestañas)</span>
+                  <span style="color: #6ee7b7; font-weight: 800;">-1,240 MB</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #e2e8f0;">
+                  <span>Discord.exe</span>
+                  <span style="color: #6ee7b7; font-weight: 800;">-480 MB</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #e2e8f0;">
+                  <span>steamwebhelper.exe</span>
+                  <span style="color: #6ee7b7; font-weight: 800;">-610 MB</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 4: TELEMETRÍA GAMER & OVERLAY PRO (17.5s - 23.0s) -->
+      <!-- ======================================================== -->
+      <div id="scene-4" class="clip scene" data-start="17.5" data-duration="5.5" data-track-index="0" style="opacity: 0;" data-layout-allow-overlap>
+        
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <span style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(251, 191, 36, 0.5); padding: 6px 18px; border-radius: 9999px; font-size: 13px; font-weight: 800; color: #fde68a; letter-spacing: 0.1em; text-transform: uppercase;">
+            👑 Edición Pro Exclusiva
+          </span>
+        </div>
+
+        <h2 style="font-size: 50px; font-weight: 900; text-align: center; margin-bottom: 30px; color: #ffffff;">
+          Overlay In-Game <span style="color: #fde68a;" class="text-glow-amber">Click-Through</span> y Telemetría Real
+        </h2>
+
+        <div style="display: flex; gap: 32px; width: 1400px; justify-content: center; align-items: stretch;">
+          
+          <!-- Telemetry Live Tiles -->
+          <div style="flex: 1.2; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            
+            <!-- Tile 1: FPS -->
+            <div class="glass-card" style="padding: 24px;">
+              <div style="font-size: 13px; font-weight: 800; color: #cbd5e1; margin-bottom: 6px;">CUADROS POR SEGUNDO</div>
+              <div id="s4-fps" class="mono" style="font-size: 60px; font-weight: 900; color: #6ee7b7;">144</div>
+              <div style="font-size: 13px; color: #34d399; font-weight: 800;">+45% FPS MÁS ESTABLES</div>
+            </div>
+
+            <!-- Tile 2: GPU 3D Load -->
+            <div class="glass-card" style="padding: 24px;">
+              <div style="font-size: 13px; font-weight: 800; color: #cbd5e1; margin-bottom: 6px;">CARGA GPU 3D (AMD/NVIDIA)</div>
+              <div class="mono" style="font-size: 60px; font-weight: 900; color: #a5b4fc;">98%</div>
+              <div style="font-size: 13px; color: #a5b4fc; font-weight: 800;">DIRECT3D NATIVO CERO OVERHEAD</div>
+            </div>
+
+            <!-- Tile 3: VRAM -->
+            <div class="glass-card" style="padding: 24px;">
+              <div style="font-size: 13px; font-weight: 800; color: #cbd5e1; margin-bottom: 6px;">MEMORIA VRAM DEDICADA</div>
+              <div class="mono" style="font-size: 60px; font-weight: 900; color: #67e8f9;">5.4 GB</div>
+              <div style="font-size: 13px; color: #cbd5e1;">de 8.0 GB Disponibles</div>
+            </div>
+
+            <!-- Tile 4: CPU Overhead -->
+            <div class="glass-card" style="padding: 24px;">
+              <div style="font-size: 13px; font-weight: 800; color: #cbd5e1; margin-bottom: 6px;">CONSUMO DE OPTIMAAI</div>
+              <div class="mono" style="font-size: 60px; font-weight: 900; color: #ffffff;">0.0%</div>
+              <div style="font-size: 13px; color: #6ee7b7; font-weight: 800;">CERO CONSUMO EN SEGUNDO PLANO</div>
+            </div>
+
+          </div>
+
+          <!-- In-Game HUD Visual Showcase -->
+          <div class="glass-card-pro" style="flex: 1; padding: 32px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <span class="mono" style="font-size: 13px; font-weight: 800; color: #fde68a;">HUD FLOTANTE IN-GAME</span>
+                <span style="background: rgba(245, 158, 11, 0.25); color: #fde68a; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800;">TOP-RIGHT / TOP-LEFT</span>
+              </div>
+              <p style="font-size: 15px; color: #e2e8f0; line-height: 1.5; margin-bottom: 22px;">
+                Ventana flotante transparente con tecnología Win32 Click-Through: los clics pasan directamente a tu mira sin causar retraso de entrada (input lag).
+              </p>
+              
+              <!-- Mini HUD Preview Box -->
+              <div style="background: rgba(10, 15, 29, 0.95); border: 1px solid rgba(251, 191, 36, 0.5); border-radius: 12px; padding: 16px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 8px; margin-bottom: 10px;">
+                  <span class="mono" style="font-size: 12px; font-weight: 800; color: #fde68a;">OPTIMAAI HUD (CS2)</span>
+                  <span class="mono" style="font-size: 14px; font-weight: 900; color: #34d399;">144 FPS</span>
+                </div>
+                <div class="mono" style="font-size: 12px; color: #cbd5e1; display: flex; flex-direction: column; gap: 6px;">
+                  <div style="display: flex; justify-content: space-between;"><span>GPU Load:</span><span style="color: #ffffff; font-weight: 800;">98%</span></div>
+                  <div style="display: flex; justify-content: space-between;"><span>VRAM:</span><span style="color: #ffffff; font-weight: 800;">5.4 / 8.0 GB</span></div>
+                  <div style="display: flex; justify-content: space-between;"><span>RAM:</span><span style="color: #ffffff; font-weight: 800;">5.8 / 16.0 GB</span></div>
+                </div>
+              </div>
+
+            </div>
+
+            <div style="font-size: 13px; color: #cbd5e1; text-align: center; margin-top: 18px;">
+              Compatible con Borderless y Windowed en DirectX 11, 12 y Vulkan.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SCENE 5: LLAMADO A LA ACCIÓN (23.0s - 28.0s)             -->
+      <!-- ======================================================== -->
+      <div id="scene-5" class="clip scene" data-start="23.0" data-duration="5.0" data-track-index="0" style="opacity: 0;" data-layout-allow-overlap>
+        
+        <!-- Big Final Title -->
+        <div id="s5-brand" style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 16px;">
+          <span style="font-size: 80px; font-weight: 900; letter-spacing: -0.03em; color: #ffffff;">
+            Optima<span style="color: #a5b4fc;" class="text-glow-indigo">AI</span>
+          </span>
+          <span class="mono" style="font-size: 44px; font-weight: 900; color: #6ee7b7;">v1.2.0</span>
+        </div>
+
+        <p id="s5-tagline" style="font-size: 26px; color: #f1f5f9; margin-bottom: 40px; text-align: center;">
+          Descarga gratuita • Código abierto • Sin instaladores pesados
+        </p>
+
+        <!-- CTA Buttons & Links Container -->
+        <div id="s5-buttons" style="display: flex; gap: 28px; margin-bottom: 35px;">
+          
+          <!-- GitHub Download CTA -->
+          <div style="background: linear-gradient(135deg, #4338ca, #0284c7); padding: 20px 42px; border-radius: 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 0 50px rgba(99, 102, 241, 0.5);">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <div>
+              <div class="mono" style="font-size: 12px; font-weight: 800; color: #e0e7ff; letter-spacing: 0.1em; text-transform: uppercase;">GitHub Release</div>
+              <div style="font-size: 22px; font-weight: 900; color: #ffffff;">Descargar OptimaAI.exe</div>
+            </div>
+          </div>
+
+          <!-- Patreon Pro CTA -->
+          <div style="background: rgba(245, 158, 11, 0.2); border: 2px solid rgba(251, 191, 36, 0.6); padding: 20px 42px; border-radius: 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 0 40px rgba(245, 158, 11, 0.25);">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="#fbbf24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <div>
+              <div class="mono" style="font-size: 12px; font-weight: 800; color: #fef3c7; letter-spacing: 0.1em; text-transform: uppercase;">Patreon Supporters</div>
+              <div style="font-size: 22px; font-weight: 900; color: #fbbf24;">patreon.com/Reselec</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer link -->
+        <div id="s5-footer" class="mono" style="font-size: 20px; color: #cbd5e1; letter-spacing: 0.05em;">
+          github.com/PabloGRuiz/OptimaAI
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- GSAP Master Seekable Timeline Script -->
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+
+      // ========================================================
+      // SCENE 1 ANIMATIONS (0s - 5.5s)
+      // ========================================================
+      tl.fromTo("#s1-pill", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.2);
+      tl.fromTo("#s1-title", { opacity: 0, y: 30, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out" }, 0.4);
+      tl.fromTo("#s1-cards", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.15, ease: "power3.out" }, 0.8);
+      // Exit Scene 1
+      tl.to("#scene-1", { opacity: 0, scale: 1.05, duration: 0.6, ease: "power2.inOut" }, 5.0);
+
+      // ========================================================
+      // SCENE 2 ANIMATIONS (5.5s - 11.5s)
+      // ========================================================
+      tl.set("#scene-2", { opacity: 1 }, 5.5);
+      tl.fromTo("#s2-logo", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)" }, 5.7);
+      tl.fromTo("#s2-desc", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 6.1);
+      tl.fromTo("#s2-features", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "power3.out" }, 6.5);
+      // Glow shift
+      tl.to("#orb-blue", { scale: 1.3, duration: 3, ease: "sine.inOut" }, 6.0);
+      // Exit Scene 2
+      tl.to("#scene-2", { opacity: 0, scale: 0.95, duration: 0.6, ease: "power2.inOut" }, 11.0);
+
+      // ========================================================
+      // SCENE 3 ANIMATIONS (11.5s - 17.5s)
+      // ========================================================
+      tl.set("#scene-3", { opacity: 1 }, 11.5);
+      tl.fromTo("#scene-3 h2", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 11.7);
+      tl.fromTo("#scene-3 .glass-card", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 12.0);
+      // RAM flush animation: text drops and bar shrinks
+      tl.to("#s3-ram-text", { innerText: "5.8 GB", duration: 1.5, snap: { innerText: 0.1 }, ease: "power2.out" }, 13.0);
+      tl.to("#s3-ram-bar", { width: "36%", duration: 1.5, ease: "power2.out" }, 13.0);
+      tl.fromTo("#s3-freed-badge", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)" }, 14.0);
+      // Exit Scene 3
+      tl.to("#scene-3", { opacity: 0, scale: 1.05, duration: 0.6, ease: "power2.inOut" }, 17.0);
+
+      // ========================================================
+      // SCENE 4 ANIMATIONS (17.5s - 23.0s)
+      // ========================================================
+      tl.set("#scene-4", { opacity: 1 }, 17.5);
+      tl.to("#orb-amber", { opacity: 0.5, scale: 1.4, duration: 1 }, 17.5);
+      tl.fromTo("#scene-4 h2", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 17.7);
+      tl.fromTo("#scene-4 .glass-card, #scene-4 .glass-card-pro", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }, 18.0);
+      // FPS counter jumps up
+      tl.to("#s4-fps", { innerText: 144, duration: 1.2, snap: { innerText: 1 }, ease: "power3.out" }, 19.0);
+      // Exit Scene 4
+      tl.to("#scene-4", { opacity: 0, scale: 0.95, duration: 0.6, ease: "power2.inOut" }, 22.5);
+
+      // ========================================================
+      // SCENE 5 ANIMATIONS (23.0s - 28.0s)
+      // ========================================================
+      tl.set("#scene-5", { opacity: 1 }, 23.0);
+      tl.fromTo("#s5-brand", { opacity: 0, scale: 0.85, y: 20 }, { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: "back.out(1.5)" }, 23.2);
+      tl.fromTo("#s5-tagline", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 23.6);
+      tl.fromTo("#s5-buttons", { opacity: 0, y: 30, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out" }, 23.9);
+      tl.fromTo("#s5-footer", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 24.3);
+
+      tl.seek(0);
+    </script>
+  </body>
+</html>

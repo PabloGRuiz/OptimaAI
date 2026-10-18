@@ -10,9 +10,13 @@ from __future__ import annotations
 import os
 import sys
 import time
+import json
 import threading
 import tkinter as tk
+from pathlib import Path
 from typing import Optional, Dict, Any, List
+
+from backend.config import settings
 
 GWL_EXSTYLE = -20
 WS_EX_TOPMOST = 0x00000008
@@ -20,6 +24,60 @@ WS_EX_TRANSPARENT = 0x00000020
 WS_EX_LAYERED = 0x00080000
 WS_EX_TOOLWINDOW = 0x00000080
 WS_EX_NOACTIVATE = 0x08000000
+
+VK_KEY_MAP: Dict[str, int] = {
+    "F1": 0x70, "F2": 0x71, "F3": 0x72, "F4": 0x73,
+    "F5": 0x74, "F6": 0x75, "F7": 0x76, "F8": 0x77,
+    "F9": 0x78, "F10": 0x79, "F11": 0x7A, "F12": 0x7B
+}
+
+def get_display_info() -> Dict[str, int]:
+    """Retrieves physical screen resolution and native refresh rate (Hz)."""
+    width = 1920
+    height = 1080
+    refresh_rate = 60
+    if sys.platform.startswith("win"):
+        try:
+            import ctypes
+            from ctypes import wintypes
+            class DEVMODEW(ctypes.Structure):
+                _fields_ = [
+                    ('dmDeviceName', wintypes.WCHAR * 32),
+                    ('dmSpecVersion', wintypes.WORD),
+                    ('dmDriverVersion', wintypes.WORD),
+                    ('dmSize', wintypes.WORD),
+                    ('dmDriverExtra', wintypes.WORD),
+                    ('dmFields', wintypes.DWORD),
+                    ('dmOrientation', ctypes.c_short),
+                    ('dmPaperSize', ctypes.c_short),
+                    ('dmPaperLength', ctypes.c_short),
+                    ('dmPaperWidth', ctypes.c_short),
+                    ('dmScale', ctypes.c_short),
+                    ('dmCopies', ctypes.c_short),
+                    ('dmDefaultSource', ctypes.c_short),
+                    ('dmPrintQuality', ctypes.c_short),
+                    ('dmColor', ctypes.c_short),
+                    ('dmDuplex', ctypes.c_short),
+                    ('dmYResolution', ctypes.c_short),
+                    ('dmTTOption', ctypes.c_short),
+                    ('dmCollate', ctypes.c_short),
+                    ('dmFormName', wintypes.WCHAR * 32),
+                    ('dmLogPixels', wintypes.WORD),
+                    ('dmBitsPerPel', wintypes.DWORD),
+                    ('dmPelsWidth', wintypes.DWORD),
+                    ('dmPelsHeight', wintypes.DWORD),
+                    ('dmDisplayFlags', wintypes.DWORD),
+                    ('dmDisplayFrequency', wintypes.DWORD),
+                ]
+            dm = DEVMODEW()
+            dm.dmSize = ctypes.sizeof(DEVMODEW)
+            if ctypes.windll.user32.EnumDisplaySettingsW(None, -1, ctypes.byref(dm)):
+                width = int(dm.dmPelsWidth) or 1920
+                height = int(dm.dmPelsHeight) or 1080
+                refresh_rate = int(dm.dmDisplayFrequency) or 60
+        except Exception:
+            pass
+    return {"width": width, "height": height, "refresh_rate": refresh_rate}
 
 # Color Themes definition
 THEMES = {
@@ -88,13 +146,19 @@ THEMES = {
 class InGameOverlay:
     def __init__(self):
         self.is_active: bool = False
-        self.position: str = "top-right"  # "top-left", "top-right", "bottom-left", "bottom-right"
+        self.position: str = "top-right"  # "top-left", "top-right", "bottom-left", "bottom-right", "top-center", "bottom-center", "custom"
+        self.pos_x: Optional[int] = None
+        self.pos_y: Optional[int] = None
         self.theme: str = "cyan"          # "cyan", "cyberpunk", "violet", "stealth"
         self.layout: str = "full"         # "full" or "compact"
+        self.overlay_hotkey: str = "F10"
+        self.benchmark_hotkey: str = "F11"
+        self.sound_enabled: bool = True
         
         self._visible: bool = False
         self._root: Optional[tk.Tk] = None
         self._thread: Optional[threading.Thread] = None
+        self._hotkey_thread: Optional[threading.Thread] = None
         self._lock = threading.Lock()
         
         # UI Element references
@@ -112,8 +176,91 @@ class InGameOverlay:
         self._lbl_pro: Optional[tk.Label] = None
         self._canvas_spark: Optional[tk.Canvas] = None
 
-        # Start persistent daemon window thread
+        self._storage_file = settings.app_data_dir / "overlay_settings.json"
+        self._load_settings()
+
+        # Start persistent daemon window thread & global hotkeys
         self._start_daemon_thread()
+        self._start_hotkey_listener()
+
+    def _load_settings(self):
+        """Loads persistent user overlay coordinates, theme and hotkeys."""
+        try:
+            if self._storage_file.exists():
+                with open(self._storage_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    self.position = data.get("position", self.position)
+                    self.pos_x = data.get("pos_x", self.pos_x)
+                    self.pos_y = data.get("pos_y", self.pos_y)
+                    self.theme = data.get("theme", self.theme)
+                    self.layout = data.get("layout", self.layout)
+                    self.overlay_hotkey = data.get("overlay_hotkey", self.overlay_hotkey)
+                    self.benchmark_hotkey = data.get("benchmark_hotkey", self.benchmark_hotkey)
+                    self.sound_enabled = data.get("sound_enabled", self.sound_enabled)
+        except Exception:
+            pass
+
+    def _save_settings(self):
+        """Saves current overlay configuration to disk."""
+        try:
+            self._storage_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(self._storage_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "position": self.position,
+                    "pos_x": self.pos_x,
+                    "pos_y": self.pos_y,
+                    "theme": self.theme,
+                    "layout": self.layout,
+                    "overlay_hotkey": self.overlay_hotkey,
+                    "benchmark_hotkey": self.benchmark_hotkey,
+                    "sound_enabled": self.sound_enabled
+                }, f, indent=2)
+        except Exception:
+            pass
+
+    def _start_hotkey_listener(self):
+        """Monitors global hotkeys for toggling overlay and benchmark."""
+        if not sys.platform.startswith("win"):
+            return
+
+        def _hotkey_loop():
+            import ctypes
+            user32 = ctypes.windll.user32
+            was_overlay_down = False
+            was_bench_down = False
+
+            while True:
+                time.sleep(0.08)
+                try:
+                    vk_overlay = VK_KEY_MAP.get(self.overlay_hotkey.upper(), 0x79)
+                    vk_bench = VK_KEY_MAP.get(self.benchmark_hotkey.upper(), 0x7A)
+
+                    # 1. Overlay Toggle Hotkey
+                    state_ov = user32.GetAsyncKeyState(vk_overlay)
+                    is_ov_pressed = bool(state_ov & 0x8000)
+                    if is_ov_pressed and not was_overlay_down:
+                        self.toggle()
+                        if self.sound_enabled:
+                            try:
+                                import winsound
+                                winsound.Beep(750, 90)
+                            except Exception:
+                                pass
+                    was_overlay_down = is_ov_pressed
+
+                    # 2. Benchmark Toggle Hotkey
+                    state_bn = user32.GetAsyncKeyState(vk_bench)
+                    is_bn_pressed = bool(state_bn & 0x8000)
+                    if is_bn_pressed and not was_bench_down:
+                        from backend.core.benchmark_manager import benchmark_manager
+                        benchmark_manager.toggle_benchmark()
+                    was_bench_down = is_bn_pressed
+
+                except Exception:
+                    pass
+
+        self._hotkey_thread = threading.Thread(target=_hotkey_loop, daemon=True, name="OptimaOverlayHotkeyDaemon")
+        self._hotkey_thread.start()
 
     def _start_daemon_thread(self):
         """Initializes persistent Tkinter daemon thread on startup."""
@@ -143,15 +290,40 @@ class InGameOverlay:
             self.is_active = not self.is_active
             return self.is_active
 
-    def update_config(self, position: Optional[str] = None, theme: Optional[str] = None, layout: Optional[str] = None) -> Dict[str, Any]:
-        """Dynamically applies position, theme or layout changes."""
+    def update_config(
+        self,
+        position: Optional[str] = None,
+        pos_x: Optional[int] = None,
+        pos_y: Optional[int] = None,
+        theme: Optional[str] = None,
+        layout: Optional[str] = None,
+        overlay_hotkey: Optional[str] = None,
+        benchmark_hotkey: Optional[str] = None,
+        sound_enabled: Optional[bool] = None
+    ) -> Dict[str, Any]:
+        """Dynamically applies position, custom coordinates, theme, layout or hotkeys."""
         with self._lock:
-            if position in ["top-left", "top-right", "bottom-left", "bottom-right"]:
+            if position:
                 self.position = position
+                if position != "custom":
+                    self.pos_x = None
+                    self.pos_y = None
+            if pos_x is not None and pos_y is not None:
+                self.pos_x = pos_x
+                self.pos_y = pos_y
+                self.position = "custom"
             if theme in THEMES:
                 self.theme = theme
             if layout in ["full", "compact"]:
                 self.layout = layout
+            if overlay_hotkey and overlay_hotkey.upper() in VK_KEY_MAP:
+                self.overlay_hotkey = overlay_hotkey.upper()
+            if benchmark_hotkey and benchmark_hotkey.upper() in VK_KEY_MAP:
+                self.benchmark_hotkey = benchmark_hotkey.upper()
+            if sound_enabled is not None:
+                self.sound_enabled = sound_enabled
+
+        self._save_settings()
 
         # If window exists, trigger reposition and theme restyle
         if self._root:
@@ -168,8 +340,13 @@ class InGameOverlay:
             return {
                 "is_active": self.is_active,
                 "position": self.position,
+                "pos_x": self.pos_x,
+                "pos_y": self.pos_y,
                 "theme": self.theme,
-                "layout": self.layout
+                "layout": self.layout,
+                "overlay_hotkey": self.overlay_hotkey,
+                "benchmark_hotkey": self.benchmark_hotkey,
+                "sound_enabled": self.sound_enabled
             }
 
     def _apply_click_through(self, root: tk.Tk):
@@ -204,14 +381,23 @@ class InGameOverlay:
             margin_x = 24
             margin_y = 20
 
-            if self.position == "top-left":
+            if self.pos_x is not None and self.pos_y is not None:
+                x = max(0, min(int(self.pos_x), screen_width - overlay_width))
+                y = max(0, min(int(self.pos_y), screen_height - overlay_height))
+            elif self.position == "top-left":
                 x = margin_x
+                y = margin_y
+            elif self.position == "top-center":
+                x = max((screen_width - overlay_width) // 2, 0)
                 y = margin_y
             elif self.position == "top-right":
                 x = max(screen_width - overlay_width - margin_x, 20)
                 y = margin_y
             elif self.position == "bottom-left":
                 x = margin_x
+                y = max(screen_height - overlay_height - margin_y - 48, 20)
+            elif self.position == "bottom-center":
+                x = max((screen_width - overlay_width) // 2, 0)
                 y = max(screen_height - overlay_height - margin_y - 48, 20)
             else:  # bottom-right
                 x = max(screen_width - overlay_width - margin_x, 20)

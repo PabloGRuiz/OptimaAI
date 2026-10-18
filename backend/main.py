@@ -82,8 +82,13 @@ class ToggleOverlayRequest(BaseModel):
 
 class OverlayConfigRequest(BaseModel):
     position: Optional[str] = None
+    pos_x: Optional[int] = None
+    pos_y: Optional[int] = None
     theme: Optional[str] = None
     layout: Optional[str] = None
+    overlay_hotkey: Optional[str] = None
+    benchmark_hotkey: Optional[str] = None
+    sound_enabled: Optional[bool] = None
 
 class StartBenchmarkRequest(BaseModel):
     game_name: Optional[str] = None
@@ -247,15 +252,57 @@ def toggle_gaming_overlay(req: ToggleOverlayRequest):
         "auto_overlay": game_detector.auto_overlay
     }
 
+@app.get("/api/gaming/telemetry")
+def get_gaming_telemetry():
+    """
+    Returns live hardware metrics (GPU, VRAM, FPS, 1% Low), screen resolution, and overlay state.
+    """
+    from backend.core.game_overlay import get_display_info
+    snap = gpu_telemetry.get_snapshot()
+    bench = benchmark_manager.get_live_metrics()
+    display = get_display_info()
+
+    return {
+        **snap,
+        "fps": bench.get("instant_fps", snap.get("fps", display.get("refresh_rate", 60))),
+        "one_percent_low": bench.get("one_percent_low", 60),
+        "avg_fps": bench.get("avg_fps", 60),
+        "sparkline_frame_times": bench.get("sparkline_frame_times", []),
+        "is_benchmarking": bench.get("is_benchmarking", False),
+        "benchmark_elapsed_sec": bench.get("benchmark_elapsed_sec", 0.0),
+        "benchmark_game": bench.get("benchmark_game", None),
+        "overlay_active": game_overlay.is_active,
+        "overlay_position": game_overlay.position,
+        "overlay_pos_x": game_overlay.pos_x,
+        "overlay_pos_y": game_overlay.pos_y,
+        "overlay_theme": game_overlay.theme,
+        "overlay_layout": game_overlay.layout,
+        "overlay_hotkey": game_overlay.overlay_hotkey,
+        "benchmark_hotkey": game_overlay.benchmark_hotkey,
+        "sound_enabled": game_overlay.sound_enabled,
+        "screen_width": display.get("width", 1920),
+        "screen_height": display.get("height", 1080),
+        "refresh_rate": display.get("refresh_rate", 60)
+    }
+
 @app.post("/api/gaming/overlay/config")
 def update_overlay_configuration(req: OverlayConfigRequest):
     """
-    Updates the position, theme, or layout mode of the in-game HUD.
+    Updates the position, custom coordinates, theme, layout or hotkeys of the in-game HUD.
     """
     lic = license_manager.get_status()
     if not lic.is_pro:
         return {"success": False, "is_pro": False, "message": "Pro required"}
-    cfg = game_overlay.update_config(position=req.position, theme=req.theme, layout=req.layout)
+    cfg = game_overlay.update_config(
+        position=req.position,
+        pos_x=req.pos_x,
+        pos_y=req.pos_y,
+        theme=req.theme,
+        layout=req.layout,
+        overlay_hotkey=req.overlay_hotkey,
+        benchmark_hotkey=req.benchmark_hotkey,
+        sound_enabled=req.sound_enabled
+    )
     return {"success": True, "config": cfg}
 
 @app.get("/api/benchmark/status")

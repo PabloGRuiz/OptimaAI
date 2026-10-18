@@ -60,6 +60,7 @@ def build_executable():
         "--clean",
         "--noconfirm",
         "--noconsole",
+        "--uac-admin",
         f"--add-data={frontend_data}",
         f"--add-data={backend_data}",
         "--collect-submodules=backend",

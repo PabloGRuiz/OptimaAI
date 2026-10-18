@@ -22,10 +22,12 @@ import {
   Minimize2,
   X,
   Clock,
-  ChevronRight
+  ChevronRight,
+  Sliders
 } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import BenchmarkReportModal from './BenchmarkReportModal';
+import OverlaySettingsModal from './OverlaySettingsModal';
 
 export default function SmartGameBoostCard({
   detectorStatus,
@@ -48,6 +50,7 @@ export default function SmartGameBoostCard({
   const [overlayTheme, setOverlayTheme] = useState('cyan');
   const [overlayLayout, setOverlayLayout] = useState('full');
   const [overlayLoading, setOverlayLoading] = useState(false);
+  const [isOverlaySettingsOpen, setIsOverlaySettingsOpen] = useState(false);
 
   // Benchmark Pro State
   const [isBenchmarking, setIsBenchmarking] = useState(false);
@@ -143,6 +146,21 @@ export default function SmartGameBoostCard({
       } catch (e) {
         // silent
       }
+    }
+  };
+
+  const handleSaveOverlaySettings = async (cfg) => {
+    try {
+      await fetch('/api/gaming/overlay/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cfg)
+      });
+      if (cfg.position) setOverlayPosition(cfg.position);
+      if (cfg.theme) setOverlayTheme(cfg.theme);
+      if (cfg.layout) setOverlayLayout(cfg.layout);
+    } catch (e) {
+      console.warn("Error saving overlay settings:", e);
     }
   };
 
@@ -538,6 +556,18 @@ export default function SmartGameBoostCard({
             </button>
           </div>
 
+          {/* Custom Screen Position & Hotkeys Button */}
+          {isPro && (
+            <button
+              onClick={() => setIsOverlaySettingsOpen(true)}
+              className="px-2.5 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+              title="Personalizar posición en pantalla interactiva y atajos de teclado"
+            >
+              <Sliders className="h-3.5 w-3.5 text-indigo-400" />
+              <span>Personalizar (F10/F11)</span>
+            </button>
+          )}
+
           {/* Toggle Switch */}
           {isPro ? (
             <button
@@ -735,6 +765,14 @@ export default function SmartGameBoostCard({
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
         report={latestReport}
+      />
+
+      {/* Interactive Overlay & Hotkeys Customizer Modal */}
+      <OverlaySettingsModal
+        isOpen={isOverlaySettingsOpen}
+        onClose={() => setIsOverlaySettingsOpen(false)}
+        currentConfig={gamingTelemetry}
+        onSave={handleSaveOverlaySettings}
       />
 
     </div>

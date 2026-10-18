@@ -17,6 +17,7 @@ import {
   Gauge,
   EyeOff
 } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function SmartGameBoostCard({
   detectorStatus,
@@ -27,6 +28,7 @@ export default function SmartGameBoostCard({
   onUnignoreProcess,
   onOpenProModal
 }) {
+  const { t } = useLanguage();
   const [showConfig, setShowConfig] = useState(false);
   const [newGameInput, setNewGameInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -121,7 +123,7 @@ export default function SmartGameBoostCard({
   const vramPercent = Math.min(Math.round((vramUsedGb / (vramTotalGb || 1)) * 100), 100);
   const gpuLoad = gamingTelemetry?.gpu_usage_pct || 0;
   const fpsCount = gamingTelemetry?.fps || 60;
-  const gpuName = gamingTelemetry?.gpu_name || 'GPU del Sistema';
+  const gpuName = gamingTelemetry?.gpu_name || 'GPU';
 
   return (
     <div className="relative rounded-2xl bg-gradient-to-br from-slate-900/95 via-[#0c1220]/95 to-slate-900/95 border border-indigo-500/30 p-5 shadow-2xl shadow-indigo-500/10 overflow-hidden">
@@ -138,22 +140,22 @@ export default function SmartGameBoostCard({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-white tracking-tight">Smart Game Detection & Auto-Boost</h2>
+              <h2 className="text-base font-bold text-white tracking-tight">{t('smartGameBoost', 'title')}</h2>
               {isPro ? (
                 <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-gradient-to-r from-amber-500/20 to-purple-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-1">
-                  <Crown className="h-3 w-3 text-yellow-400" /> Centinela PRO
+                  <Crown className="h-3 w-3 text-yellow-400" /> {t('smartGameBoost', 'proSentinel')}
                 </span>
               ) : (
                 <button
                   onClick={onOpenProModal}
                   className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 flex items-center gap-1 transition-all"
                 >
-                  <Crown className="h-3 w-3" /> Desbloquear con Pro
+                  <Crown className="h-3 w-3" /> {t('smartGameBoost', 'unlockPro')}
                 </button>
               )}
             </div>
             <p className="text-xs text-slate-400">
-              Detección automática en Steam, Epic, Riot, telemetría de hardware en tiempo real y acelerador de FPS
+              {t('smartGameBoost', 'subtitle')}
             </p>
           </div>
         </div>
@@ -164,7 +166,7 @@ export default function SmartGameBoostCard({
             onClick={() => setShowConfig(!showConfig)}
             className="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-colors flex items-center gap-1"
           >
-            <span>{showConfig ? 'Ocultar Juegos' : '⚙️ Gestionar Juegos'}</span>
+            <span>{showConfig ? '▲' : '⚙️'} {t('smartGameBoost', 'customGamesTitle').split(' ')[0]}</span>
             <span className="px-1.5 py-0.2 rounded-full bg-slate-700 text-[10px] text-slate-300">
               {customGames.length}
             </span>
@@ -176,7 +178,7 @@ export default function SmartGameBoostCard({
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
               isEnabled ? 'bg-indigo-600' : 'bg-slate-700'
             }`}
-            title={isEnabled ? 'Pausar Centinela' : 'Activar Centinela'}
+            title={isEnabled ? 'Pausar' : 'Activar'}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -199,7 +201,7 @@ export default function SmartGameBoostCard({
               </span>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Juego Activo:</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">{t('smartGameBoost', 'activeGameTitle')}</span>
                   <span className="text-sm font-extrabold text-white">{activeGame.name}</span>
                   <span className="px-2 py-0.5 text-[10px] rounded bg-slate-800/80 text-cyan-300 border border-cyan-500/30">
                     {activeGame.platform}
@@ -209,8 +211,8 @@ export default function SmartGameBoostCard({
                 <p className="text-xs text-emerald-300/90 mt-0.5 flex items-center gap-1.5">
                   <Zap className="h-3.5 w-3.5 text-yellow-400" />
                   {isPro
-                    ? 'Prioridad de CPU ALTA activa • Aplicaciones secundarias en IDLE • Overlay In-Game listo'
-                    : 'Juego detectado pasivamente. Activa la versión Pro para aplicar Auto-Boost automático y HUD en pantalla.'}
+                    ? t('smartGameBoost', 'highPriorityActive')
+                    : t('smartGameBoost', 'freePassiveAlert')}
                 </p>
               </div>
             </div>
@@ -218,15 +220,15 @@ export default function SmartGameBoostCard({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onIgnoreProcess && onIgnoreProcess(activeGame.name)}
-                title="Si este proceso no es un juego, haz clic para ignorarlo y permitir que el centinela busque tu juego real"
+                title="Ignorar proceso si no es un juego"
                 className="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 transition-all shadow-sm"
               >
                 <EyeOff className="h-3.5 w-3.5" />
-                <span>No es un juego (Ignorar)</span>
+                <span>{t('smartGameBoost', 'notAGameBtn')}</span>
               </button>
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                 <Activity className="h-3.5 w-3.5" />
-                <span>Modo Juego Activo</span>
+                <span>{t('smartGameBoost', 'gameModeActive')}</span>
               </span>
             </div>
           </div>
@@ -243,8 +245,8 @@ export default function SmartGameBoostCard({
             </span>
             <span className="text-slate-300">
               {isEnabled
-                ? 'Centinela en espera: monitoreando Steam, Epic Games, Riot, Battle.net y juegos locales...'
-                : 'Centinela pausado por el usuario.'}
+                ? t('smartGameBoost', 'standbySentinel')
+                : t('smartGameBoost', 'pausedSentinel')}
             </span>
           </div>
 
@@ -258,12 +260,12 @@ export default function SmartGameBoostCard({
         </div>
       )}
 
-      {/* LIVE GAMING HARDWARE TELEMETRY PANEL (Community + Pro) */}
+      {/* LIVE GAMING HARDWARE TELEMETRY PANEL */}
       <div className="relative z-10 mb-4 bg-slate-950/70 border border-slate-800 rounded-xl p-3.5">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-2">
             <Activity className="h-4 w-4 text-cyan-400" />
-            <span className="text-xs font-bold text-slate-200">Telemetría Gamer en Vivo</span>
+            <span className="text-xs font-bold text-slate-200">{t('smartGameBoost', 'liveTelemetry')}</span>
             <span className="text-[10px] text-slate-400">({gpuName})</span>
           </div>
           <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
@@ -276,9 +278,9 @@ export default function SmartGameBoostCard({
           <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-400 text-[11px]">
               <span className="font-semibold flex items-center gap-1">
-                <Gauge className="h-3 w-3 text-emerald-400" /> Cuadros / Seg.
+                <Gauge className="h-3 w-3 text-emerald-400" /> {t('smartGameBoost', 'fps')}
               </span>
-              <span className="text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">FPS</span>
+              <span className="text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">{t('smartGameBoost', 'fpsBadge')}</span>
             </div>
             <div className="mt-1 flex items-baseline gap-1">
               <span className="text-xl font-extrabold text-emerald-400 font-mono">
@@ -292,7 +294,7 @@ export default function SmartGameBoostCard({
           <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-400 text-[11px]">
               <span className="font-semibold flex items-center gap-1">
-                <Flame className="h-3 w-3 text-cyan-400" /> Carga GPU
+                <Flame className="h-3 w-3 text-cyan-400" /> {t('smartGameBoost', 'gpuLoad')}
               </span>
               <span className="text-[9px] font-mono text-cyan-400 font-bold">{gpuLoad}%</span>
             </div>
@@ -310,7 +312,7 @@ export default function SmartGameBoostCard({
           <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-400 text-[11px]">
               <span className="font-semibold flex items-center gap-1">
-                <Layers className="h-3 w-3 text-purple-400" /> Memoria VRAM
+                <Layers className="h-3 w-3 text-purple-400" /> {t('smartGameBoost', 'vramUsage')}
               </span>
               <span className="text-[9px] font-mono text-purple-400 font-bold">{vramPercent}%</span>
             </div>
@@ -324,10 +326,10 @@ export default function SmartGameBoostCard({
           <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
             <div className="flex items-center justify-between text-slate-400 text-[11px]">
               <span className="font-semibold flex items-center gap-1">
-                <Cpu className="h-3 w-3 text-rose-400" /> RAM Juego
+                <Cpu className="h-3 w-3 text-rose-400" /> {t('smartGameBoost', 'gameMemory')}
               </span>
               <span className="text-[9px] font-mono text-rose-400 font-bold">
-                {activeGame ? `${gamingTelemetry?.game_cpu_pct || 0}% CPU` : 'Inactivo'}
+                {activeGame ? `${gamingTelemetry?.game_cpu_pct || 0}% CPU` : '--'}
               </span>
             </div>
             <div className="mt-1 flex items-baseline gap-1 text-[11px] font-mono text-slate-200">
@@ -347,19 +349,19 @@ export default function SmartGameBoostCard({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-white">HUD Flotante In-Game (Click-Through)</span>
+              <span className="text-xs font-bold text-white">{t('smartGameBoost', 'hudFloatingTitle')}</span>
               {isPro ? (
                 <span className="px-1.5 py-0.2 text-[9px] font-bold uppercase rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                  PRO ACTIVO
+                  {t('smartGameBoost', 'proSentinel')}
                 </span>
               ) : (
                 <span className="px-1.5 py-0.2 text-[9px] font-bold uppercase rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-0.5">
-                  <Crown className="h-2.5 w-2.5" /> EXCLUSIVO PRO
+                  <Crown className="h-2.5 w-2.5" /> PRO
                 </span>
               )}
             </div>
             <p className="text-[11px] text-slate-400">
-              Muestra FPS, GPU, VRAM y CPU sobre el juego sin pausar ni interferir con tus disparos o puntero.
+              {t('smartGameBoost', 'hudFloatingSubtitle')}
             </p>
           </div>
         </div>
@@ -373,7 +375,7 @@ export default function SmartGameBoostCard({
                 overlayPosition === 'top-left' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Arriba Izq
+              {t('smartGameBoost', 'topLeft')}
             </button>
             <button
               onClick={() => handlePositionChange('top-right')}
@@ -381,7 +383,7 @@ export default function SmartGameBoostCard({
                 overlayPosition === 'top-right' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Arriba Der
+              {t('smartGameBoost', 'topRight')}
             </button>
           </div>
 
@@ -397,7 +399,7 @@ export default function SmartGameBoostCard({
               }`}
             >
               <Eye className="h-3.5 w-3.5" />
-              <span>{overlayActive ? 'HUD Activo en Pantalla' : 'Activar HUD Flotante'}</span>
+              <span>{overlayActive ? t('smartGameBoost', 'hudActive') : t('smartGameBoost', 'hudActivate')}</span>
             </button>
           ) : (
             <button
@@ -405,7 +407,7 @@ export default function SmartGameBoostCard({
               className="px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition-all"
             >
               <Crown className="h-3.5 w-3.5" />
-              <span>Desbloquear HUD con PRO</span>
+              <span>{t('smartGameBoost', 'unlockHudWithPro')}</span>
             </button>
           )}
         </div>
@@ -416,10 +418,10 @@ export default function SmartGameBoostCard({
         <div className="mt-4 pt-4 border-t border-slate-800/80 space-y-3 relative z-10 animate-fade-in">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-slate-200">
-              Juegos Personalizados Monitoreados (Añadir .exe)
+              {t('smartGameBoost', 'customGamesTitle')}
             </h3>
             <span className="text-[11px] text-slate-400">
-              Steam y Epic se detectan automáticamente. Añade ejecutables manuales aquí.
+              {t('smartGameBoost', 'customGamesHelp')}
             </span>
           </div>
 
@@ -429,7 +431,7 @@ export default function SmartGameBoostCard({
               type="text"
               value={newGameInput}
               onChange={(e) => setNewGameInput(e.target.value)}
-              placeholder="Ejemplo: emulator.exe, gta_sa.exe, wow.exe"
+              placeholder={t('smartGameBoost', 'addPlaceholder')}
               className="flex-1 px-3 py-1.5 rounded-lg bg-slate-950/80 border border-slate-700 text-xs font-mono text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
             />
             <button
@@ -438,7 +440,7 @@ export default function SmartGameBoostCard({
               className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-1 shadow-md shadow-indigo-600/20 disabled:opacity-50 transition-colors"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>Añadir</span>
+              <span>{t('smartGameBoost', 'addBtn')}</span>
             </button>
           </form>
 
@@ -454,7 +456,7 @@ export default function SmartGameBoostCard({
                   <button
                     onClick={() => onRemoveCustomGame(game)}
                     className="text-slate-400 hover:text-rose-400 transition-colors"
-                    title={`Dejar de monitorear ${game}`}
+                    title={`Eliminar ${game}`}
                   >
                     <Trash2 className="h-3 w-3" />
                   </button>
@@ -463,7 +465,7 @@ export default function SmartGameBoostCard({
             </div>
           ) : (
             <p className="text-[11px] text-slate-500 italic">
-              No tienes ejecutables manuales añadidos aún. Cualquier juego de Steam, Epic o Riot se detectará de forma nativa.
+              {t('smartGameBoost', 'noCustomGames')}
             </p>
           )}
 
@@ -472,10 +474,10 @@ export default function SmartGameBoostCard({
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
                 <EyeOff className="h-3.5 w-3.5 text-rose-400" />
-                <span>Procesos Ignorados (Excluidos de Detección)</span>
+                <span>{t('smartGameBoost', 'ignoredTitle')}</span>
               </h4>
               <span className="text-[10px] text-slate-500">
-                Procesos en segundo plano que nunca serán considerados juegos
+                {t('smartGameBoost', 'ignoredSubtitle')}
               </span>
             </div>
             {ignoredProcesses.length > 0 ? (
@@ -489,7 +491,7 @@ export default function SmartGameBoostCard({
                     <button
                       onClick={() => onUnignoreProcess && onUnignoreProcess(proc)}
                       className="text-rose-400/70 hover:text-rose-300 transition-colors"
-                      title={`Remover de ignorados`}
+                      title="Remover de ignorados"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>
@@ -498,7 +500,7 @@ export default function SmartGameBoostCard({
               </div>
             ) : (
               <p className="text-[11px] text-slate-500 italic">
-                No hay procesos ignorados actualmente. Si algún programa secundario es detectado erróneamente, puedes descartarlo.
+                {t('smartGameBoost', 'noIgnored')}
               </p>
             )}
           </div>

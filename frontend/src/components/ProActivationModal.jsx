@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Crown, Sparkles, CheckCircle2, AlertCircle, X, ExternalLink, Key, ShieldCheck, Heart } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function ProActivationModal({ isOpen, onClose, licenseStatus, onActivateSuccess, onDeactivateSuccess }) {
   if (!isOpen) return null;
 
+  const { t } = useLanguage();
   const [inputKey, setInputKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -14,7 +16,7 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
   const handleActivate = async (e) => {
     e.preventDefault();
     if (!inputKey.trim()) {
-      setErrorMsg('Por favor ingresa una clave válida.');
+      setErrorMsg(t('proModal', 'keyInvalidToast'));
       return;
     }
 
@@ -32,23 +34,23 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
       const data = await resp.json();
 
       if (!resp.ok) {
-        throw new Error(data.detail || 'Clave no válida o firma incorrecta.');
+        throw new Error(data.detail || t('proModal', 'keyInvalidToast'));
       }
 
-      setSuccessMsg(`¡Licencia Pro activada para ${data.holder}!`);
+      setSuccessMsg(t('proModal', 'keySuccessToast'));
       if (onActivateSuccess) onActivateSuccess(data);
       setTimeout(() => {
         onClose();
       }, 1800);
     } catch (err) {
-      setErrorMsg(err.message || 'Error al validar la licencia.');
+      setErrorMsg(err.message || t('proModal', 'keyInvalidToast'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeactivate = async () => {
-    if (!window.confirm('¿Seguro que deseas desactivar la versión Pro en este equipo?')) return;
+    if (!window.confirm(t('proModal', 'deactivatePrompt'))) return;
     setLoading(true);
     try {
       const resp = await fetch('http://127.0.0.1:8765/api/license/deactivate', { method: 'POST' });
@@ -56,11 +58,12 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
       if (onDeactivateSuccess) onDeactivateSuccess(data);
       onClose();
     } catch (err) {
-      setErrorMsg('No se pudo desactivar la licencia.');
+      setErrorMsg('Error');
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
@@ -85,12 +88,12 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold tracking-tight text-white">OptimaAI PRO</h2>
+              <h2 className="text-xl font-bold tracking-tight text-white">{t('proModal', 'title')}</h2>
               <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 Patreon Edition
               </span>
             </div>
-            <p className="text-xs text-slate-400">Automatización, centinela en segundo plano y máximo rendimiento</p>
+            <p className="text-xs text-slate-400">{t('proModal', 'subtitle')}</p>
           </div>
         </div>
 
@@ -100,29 +103,29 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
             <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm flex items-start gap-3">
               <ShieldCheck className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-emerald-200">¡Tu licencia Pro está activa y validada!</p>
+                <p className="font-semibold text-emerald-200">OptimaAI PRO Active</p>
                 <p className="text-xs text-emerald-400/80 mt-1">
-                  Titular: <span className="font-bold text-white">{licenseStatus.holder}</span> ({licenseStatus.tier.toUpperCase()})
+                  {t('proModal', 'activeHolder')} <span className="font-bold text-white">{licenseStatus.holder}</span> ({licenseStatus.tier?.toUpperCase()})
                 </p>
                 {licenseStatus.activated_at && (
-                  <p className="text-[11px] text-slate-400 mt-0.5">Activada el: {licenseStatus.activated_at}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">{licenseStatus.activated_at}</p>
                 )}
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300 space-y-1.5">
-              <p className="font-medium text-slate-200">Beneficios activos en este equipo:</p>
+              <p className="font-medium text-slate-200">{t('proModal', 'lifetimeTitle')}:</p>
               <div className="flex items-center gap-2 text-slate-400">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Smart Game Boost automático</span>
+                <span>{t('proModal', 'perk1Title')}</span>
               </div>
               <div className="flex items-center gap-2 text-slate-400">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Modo Centinela en segundo plano</span>
+                <span>{t('proModal', 'perk2Title')}</span>
               </div>
               <div className="flex items-center gap-2 text-slate-400">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Soporte prioritario y acceso anticipado</span>
+                <span>{t('proModal', 'perk3Title')}</span>
               </div>
             </div>
 
@@ -132,13 +135,13 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
                 disabled={loading}
                 className="px-3.5 py-2 text-xs font-medium rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 transition-colors"
               >
-                Desactivar Licencia
+                {t('proModal', 'deactivateBtn')}
               </button>
               <button
                 onClick={onClose}
                 className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition-colors"
               >
-                Cerrar
+                {t('common', 'close')}
               </button>
             </div>
           </div>
@@ -150,19 +153,19 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>HUD Overlay In-Game</span>
+                <span>{t('proModal', 'perk1Title')}</span>
               </div>
               <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-cyan-400 shrink-0" />
-                <span>Auto-Boost de Juegos</span>
+                <span>{t('proModal', 'perk2Title')}</span>
               </div>
               <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
                 <Key className="h-4 w-4 text-purple-400 shrink-0" />
-                <span>Prioridad CPU Alta</span>
+                <span>{t('proModal', 'perk3Title')}</span>
               </div>
               <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
                 <Crown className="h-4 w-4 text-yellow-400 shrink-0" />
-                <span>Soporte Prioritario</span>
+                <span>{t('proModal', 'perk4Title')}</span>
               </div>
             </div>
 
@@ -170,10 +173,10 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
             <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-indigo-500/10 border border-amber-500/20 flex items-center justify-between gap-3">
               <div className="text-xs">
                 <p className="font-semibold text-amber-300 flex items-center gap-1.5">
-                  <Heart className="h-3.5 w-3.5 text-rose-400 fill-rose-400" /> ¿Aún no tienes tu clave?
+                  <Heart className="h-3.5 w-3.5 text-rose-400 fill-rose-400" /> {t('proModal', 'patreonLink')}
                 </p>
                 <p className="text-slate-400 text-[11px] mt-0.5">
-                  Apoya el proyecto en Patreon o pídele una clave de prueba al desarrollador.
+                  {t('proModal', 'perk4Desc')}
                 </p>
               </div>
               <a
@@ -191,13 +194,13 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
             <form onSubmit={handleActivate} className="space-y-3 pt-1">
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center gap-1.5">
-                  <Key className="h-3.5 w-3.5 text-amber-400" /> Ingresa tu Clave de Licencia:
+                  <Key className="h-3.5 w-3.5 text-amber-400" /> {t('proModal', 'enterKeyPrompt')}
                 </label>
                 <input
                   type="text"
                   value={inputKey}
                   onChange={(e) => setInputKey(e.target.value.toUpperCase())}
-                  placeholder="OPRO-NOMBRE-XXXX-XXXX-XXXX"
+                  placeholder={t('proModal', 'keyPlaceholder')}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm font-mono tracking-wider text-amber-200 placeholder:text-slate-600 transition-colors"
                 />
               </div>
@@ -225,7 +228,7 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
                   onClick={onClose}
                   className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
                 >
-                  Cancelar
+                  {t('common', 'cancel')}
                 </button>
                 <button
                   type="submit"
@@ -237,7 +240,7 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
                   ) : (
                     <Sparkles className="h-3.5 w-3.5" />
                   )}
-                  <span>Activar OptimaAI PRO</span>
+                  <span>{loading ? t('proModal', 'activating') : t('proModal', 'activateBtn')}</span>
                 </button>
               </div>
             </form>

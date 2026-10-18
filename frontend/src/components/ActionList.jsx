@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Check, X, ShieldAlert, ShieldCheck, AlertCircle, Play, CheckCircle } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function ActionList({
   issues,
@@ -7,6 +8,7 @@ export default function ActionList({
   executing,
   executionResult
 }) {
+  const { t } = useLanguage();
   const [selectedPids, setSelectedPids] = useState(() => {
     // By default, select issues where action is 'terminate' or 'trim_memory' AND safe to execute
     const initial = new Set();
@@ -24,13 +26,14 @@ export default function ActionList({
     return (
       <div className="glass-panel rounded-2xl p-6 text-center">
         <CheckCircle className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-        <h4 className="text-sm font-semibold text-white">Sin acciones pendientes</h4>
+        <h4 className="text-sm font-semibold text-white">{t('actions', 'emptyTitle')}</h4>
         <p className="text-xs text-slate-400 mt-1">
-          No se encontraron procesos que requieran terminación forzada o intervención en este escaneo.
+          {t('actions', 'emptyDesc')}
         </p>
       </div>
     );
   }
+
 
   const togglePid = (pid, isSafe) => {
     if (!isSafe) return;
@@ -79,13 +82,13 @@ export default function ActionList({
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-800">
         <div>
           <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <span>Acciones de Optimización Recomendadas</span>
+            <span>{t('actions', 'title')}</span>
             <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-              {issues.length} detectadas
+              {issues.length} {t('actions', 'detectedCount', 'detectadas')}
             </span>
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            Selecciona los procesos que deseas finalizar o optimizar con validación de seguridad.
+            {t('actions', 'subtitle')}
           </p>
         </div>
 
@@ -94,13 +97,13 @@ export default function ActionList({
             onClick={selectAllSafe}
             className="text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition"
           >
-            Seleccionar Seguros
+            {t('actions', 'selectSafe')}
           </button>
           <button
             onClick={deselectAll}
             className="text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition"
           >
-            Deseleccionar
+            {t('actions', 'deselectAll')}
           </button>
         </div>
       </div>
@@ -143,11 +146,11 @@ export default function ActionList({
                     </span>
                     {isSafe ? (
                       <span className="flex items-center gap-1 text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                        <ShieldCheck className="h-3 w-3" /> Seguro
+                        <ShieldCheck className="h-3 w-3" /> {t('actions', 'safe')}
                       </span>
                     ) : (
                       <span className="flex items-center gap-1 text-[11px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                        <ShieldAlert className="h-3 w-3" /> Protegido
+                        <ShieldAlert className="h-3 w-3" /> {t('actions', 'protected')}
                       </span>
                     )}
                   </div>
@@ -184,7 +187,7 @@ export default function ActionList({
       {/* Confirmation & CTA Bar */}
       <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between">
         <div className="text-xs text-slate-400">
-          <span className="text-white font-semibold">{selectedPids.size}</span> procesos seleccionados para optimizar
+          <span className="text-white font-semibold">{selectedPids.size}</span> {t('actions', 'selectedCount')}
         </div>
 
         <button
@@ -193,7 +196,7 @@ export default function ActionList({
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           <Play className="h-4 w-4 fill-current" />
-          <span>Ejecutar optimizaciones recomendadas</span>
+          <span>{t('actions', 'executeBtn')}</span>
         </button>
       </div>
 
@@ -201,23 +204,22 @@ export default function ActionList({
       {confirmModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="glass-panel bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <h4 className="text-lg font-bold text-white mb-2">Confirmar Optimización</h4>
+            <h4 className="text-lg font-bold text-white mb-2">{t('actions', 'confirmTitle')}</h4>
             <p className="text-sm text-slate-300 leading-relaxed mb-4">
-              Estás a punto de finalizar <strong className="text-indigo-400">{selectedPids.size}</strong> procesos seleccionados.
-              Cada proceso ha sido verificado contra la Safe List del sistema para evitar cierres de componentes esenciales.
+              {t('actions', 'confirmDesc')} (<strong className="text-indigo-400">{selectedPids.size}</strong>)
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setConfirmModalOpen(false)}
                 className="px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition"
               >
-                Cancelar
+                {t('actions', 'confirmCancel')}
               </button>
               <button
                 onClick={handleConfirmAndRun}
                 className="px-4 py-2 rounded-lg text-sm font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-600/30 transition"
               >
-                Sí, ejecutar acciones
+                {t('actions', 'confirmExecute')}
               </button>
             </div>
           </div>
@@ -229,10 +231,10 @@ export default function ActionList({
         <div className="mt-4 p-4 rounded-xl bg-slate-900 border border-indigo-500/30">
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
-              <Check className="h-4 w-4 text-emerald-400" /> Resumen de Ejecución
+              <Check className="h-4 w-4 text-emerald-400" /> {t('actions', 'executionSummary')}
             </h4>
             <span className="text-xs text-emerald-400 font-semibold">
-              +{executionResult.total_freed_ram_mb} MB liberados
+              +{executionResult.total_freed_ram_mb} {t('actions', 'freedMb')}
             </span>
           </div>
           <div className="space-y-1 text-xs text-slate-300">
@@ -251,3 +253,4 @@ export default function ActionList({
     </div>
   );
 }
+

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Terminal, Shield, ShieldAlert, Cpu, Zap, Info, ChevronDown, ChevronUp, Trash2, CheckCircle2, ArrowRight } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function ActivityLogPanel({ logs, onClearLogs, latestTrimSummary }) {
+  const { t } = useLanguage();
   const [filter, setFilter] = useState('all'); // all, ram, terminate, blocked
   const [expandedLogIdx, setExpandedLogIdx] = useState(null);
   const [showExplanation, setShowExplanation] = useState(true);
@@ -25,13 +27,13 @@ export default function ActivityLogPanel({ logs, onClearLogs, latestTrimSummary 
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white">Registro de Decisiones & Auditoría Técnica</h3>
+              <h3 className="text-base font-bold text-white">{t('logs', 'title')}</h3>
               <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                {logs?.length || 0} eventos
+                {logs?.length || 0} {t('logs', 'eventsCount', 'eventos')}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Transparencia total: Qué procesos se optimizan, cuánto liberan y el criterio exacto utilizado.
+              {t('logs', 'subtitle')}
             </p>
           </div>
         </div>
@@ -43,32 +45,32 @@ export default function ActivityLogPanel({ logs, onClearLogs, latestTrimSummary 
               onClick={() => setFilter('all')}
               className={`px-2.5 py-1 rounded-md transition ${filter === 'all' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
             >
-              Todos
+              {t('logs', 'tabAll')}
             </button>
             <button
               onClick={() => setFilter('ram')}
               className={`px-2.5 py-1 rounded-md transition ${filter === 'ram' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
             >
-              Vaciado de RAM
+              {t('logs', 'tabRam')}
             </button>
             <button
               onClick={() => setFilter('terminate')}
               className={`px-2.5 py-1 rounded-md transition ${filter === 'terminate' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
             >
-              Procesos Cerrados
+              {t('logs', 'tabTerminate')}
             </button>
             <button
               onClick={() => setFilter('blocked')}
               className={`px-2.5 py-1 rounded-md transition ${filter === 'blocked' ? 'bg-indigo-600 text-white font-semibold' : 'text-slate-400 hover:text-slate-200'}`}
             >
-              Protegidos (Safe List)
+              {t('logs', 'tabBlocked')}
             </button>
           </div>
 
           {logs && logs.length > 0 && (
             <button
               onClick={onClearLogs}
-              title="Limpiar registro de actividad"
+              title={t('logs', 'clearBtn')}
               className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-rose-400 hover:bg-slate-700 transition"
             >
               <Trash2 className="h-4 w-4" />
@@ -85,12 +87,13 @@ export default function ActivityLogPanel({ logs, onClearLogs, latestTrimSummary 
         >
           <div className="flex items-center gap-2.5 text-cyan-300 font-bold text-sm">
             <Info className="h-4 w-4 text-cyan-400 flex-shrink-0" />
-            <span>¿Por qué se libera tanta memoria RAM con un solo clic sin cerrar aplicaciones?</span>
+            <span>{t('logs', 'faqTitle')}</span>
           </div>
           <button className="text-slate-400 hover:text-white">
             {showExplanation ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
         </div>
+
 
         {showExplanation && (
           <div className="mt-3 text-xs text-slate-300 space-y-2.5 border-t border-cyan-500/20 pt-3 leading-relaxed">

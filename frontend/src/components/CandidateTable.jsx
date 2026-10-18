@@ -1,7 +1,9 @@
 import React from 'react';
 import { AlertCircle, Shield, ShieldAlert, Activity } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function CandidateTable({ candidates }) {
+  const { t } = useLanguage();
   if (!candidates || candidates.length === 0) return null;
 
   return (
@@ -10,10 +12,10 @@ export default function CandidateTable({ candidates }) {
         <div>
           <h3 className="text-base font-bold text-white flex items-center gap-2">
             <Activity className="h-4 w-4 text-cyan-400" />
-            <span>Procesos Clave en Evaluación (Top Candidatos)</span>
+            <span>{t('candidates', 'title')}</span>
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            Snapshot sanitizado enviado al contexto de inferencia del LLM
+            {t('candidates', 'subtitle')}
           </p>
         </div>
       </div>
@@ -22,12 +24,12 @@ export default function CandidateTable({ candidates }) {
         <table className="w-full text-left text-xs">
           <thead>
             <tr className="border-b border-slate-800 text-slate-400">
-              <th className="pb-3 font-semibold">PID</th>
-              <th className="pb-3 font-semibold">Proceso</th>
-              <th className="pb-3 font-semibold">CPU</th>
-              <th className="pb-3 font-semibold">RAM</th>
-              <th className="pb-3 font-semibold">Seguridad</th>
-              <th className="pb-3 font-semibold">Ruta / Anomalías</th>
+              <th className="pb-3 font-semibold">{t('candidates', 'pid')}</th>
+              <th className="pb-3 font-semibold">{t('candidates', 'process')}</th>
+              <th className="pb-3 font-semibold">{t('candidates', 'cpu')}</th>
+              <th className="pb-3 font-semibold">{t('candidates', 'ram')}</th>
+              <th className="pb-3 font-semibold">{t('candidates', 'security')}</th>
+              <th className="pb-3 font-semibold">{t('candidates', 'pathAnomalies')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/60">
@@ -48,14 +50,14 @@ export default function CandidateTable({ candidates }) {
                 <td className="py-2.5">
                   {p.is_protected ? (
                     <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                      <Shield className="h-3 w-3" /> Protegido
+                      <Shield className="h-3 w-3" /> {t('candidates', 'protected')}
                     </span>
                   ) : p.is_suspicious ? (
                     <span className="inline-flex items-center gap-1 text-[11px] text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
-                      <ShieldAlert className="h-3 w-3" /> Anomalía
+                      <ShieldAlert className="h-3 w-3" /> {t('candidates', 'anomaly')}
                     </span>
                   ) : (
-                    <span className="text-[11px] text-slate-400">Estándar</span>
+                    <span className="text-[11px] text-slate-400">{t('candidates', 'standard')}</span>
                   )}
                 </td>
                 <td className="py-2.5 max-w-xs truncate text-slate-400 font-mono text-[11px]">
@@ -76,3 +78,4 @@ export default function CandidateTable({ candidates }) {
     </div>
   );
 }
+

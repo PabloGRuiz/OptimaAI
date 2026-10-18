@@ -27,6 +27,7 @@ from backend.core.game_detector import game_detector, GameDetectorStatus
 from backend.core.audit_logger import audit_logger
 from backend.core.gpu_telemetry import gpu_telemetry
 from backend.core.game_overlay import game_overlay
+from backend.core.updater import update_manager
 
 app = FastAPI(
     title=settings.app_name,
@@ -236,6 +237,27 @@ def get_health():
         "ollama_url": settings.ollama.base_url,
         "active_model": ollama_engine.model
     }
+
+@app.get("/api/system/update/check")
+def check_for_system_update(force: bool = False):
+    """
+    Checks GitHub Releases for new OptimaAI versions.
+    """
+    return update_manager.check_for_updates(force=force).model_dump()
+
+@app.get("/api/system/update/progress")
+def get_update_progress():
+    """
+    Returns current download and replacement status of background updater.
+    """
+    return update_manager.get_progress()
+
+@app.post("/api/system/update/apply")
+def apply_system_update():
+    """
+    Downloads new binary and triggers autonomous in-place replacement.
+    """
+    return update_manager.apply_update_in_background()
 
 @app.get("/api/ollama/status")
 async def get_ollama_manager_status():

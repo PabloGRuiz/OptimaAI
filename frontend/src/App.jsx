@@ -8,9 +8,12 @@ import ActivityLogPanel from './components/ActivityLogPanel';
 import OllamaStatusBanner from './components/OllamaStatusBanner';
 import ProActivationModal from './components/ProActivationModal';
 import SmartGameBoostCard from './components/SmartGameBoostCard';
+import UpdateModal from './components/UpdateModal';
+import { useLanguage } from './i18n/LanguageContext';
 import { Play, Zap, RefreshCw, AlertCircle, CheckCircle2, Rocket } from 'lucide-react';
 
 export default function App() {
+  const { t } = useLanguage();
   const [systemStatus, setSystemStatus] = useState(null);
   const [models, setModels] = useState([]);
   const [activeModel, setActiveModel] = useState('llama3.2:latest');
@@ -23,6 +26,10 @@ export default function App() {
   const [detectorStatus, setDetectorStatus] = useState(null);
   const [isProModalOpen, setIsProModalOpen] = useState(false);
   
+  // Auto-updater state
+  const [updateInfo, setUpdateInfo] = useState(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  
   const [refreshing, setRefreshing] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [diagnosing, setDiagnosing] = useState(false);
@@ -33,6 +40,7 @@ export default function App() {
   
   const [executionResult, setExecutionResult] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+
 
   const showToast = (msg, type = 'info') => {
     setToastMessage({ msg, type });
@@ -121,6 +129,19 @@ export default function App() {
     }
   }, []);
 
+  // 6. Check for app updates via GitHub releases
+  const fetchUpdateInfo = useCallback(async () => {
+    try {
+      const res = await fetch('/api/system/update/check');
+      if (res.ok) {
+        const data = await res.json();
+        setUpdateInfo(data);
+      }
+    } catch (e) {
+      console.warn("Error checking for updates:", e);
+    }
+  }, []);
+
   const handleToggleDetector = async (enabled) => {
     try {
       const res = await fetch('/api/game-detector/toggle', {
@@ -201,6 +222,7 @@ export default function App() {
     fetchLogs();
     fetchLicenseStatus();
     fetchGameDetectorStatus();
+    fetchUpdateInfo();
     const interval = setInterval(() => {
       fetchStatus();
       fetchOllamaStatus();
@@ -219,7 +241,8 @@ export default function App() {
       clearInterval(interval);
       window.removeEventListener('beforeunload', handleUnload);
     };
-  }, [fetchStatus, fetchModels, fetchOllamaStatus, fetchLogs, fetchLicenseStatus, fetchGameDetectorStatus]);
+  }, [fetchStatus, fetchModels, fetchOllamaStatus, fetchLogs, fetchLicenseStatus, fetchGameDetectorStatus, fetchUpdateInfo]);
+
 
   const handleLaunchOllama = async () => {
     setLaunchingOllama(true);
@@ -383,11 +406,14 @@ export default function App() {
         ollamaStatus={ollamaStatus}
         licenseStatus={licenseStatus}
         onOpenProModal={() => setIsProModalOpen(true)}
+        updateInfo={updateInfo}
+        onOpenUpdateModal={() => setIsUpdateModalOpen(true)}
         onRefresh={async () => {
           setRefreshing(true);
           await fetchStatus();
           await fetchOllamaStatus();
           await fetchLicenseStatus();
+          await fetchUpdateInfo();
           setRefreshing(false);
         }}
       />
@@ -437,11 +463,11 @@ export default function App() {
         <div className="glass-panel rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <span>Optimización & Rendimiento</span>
+              <span>{t('diagnostic', 'title')}</span>
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Inspección diferencial de procesos, recorte de páginas inactivas y perfiles de aceleración.
+              {t('diagnostic', 'subtitle')}
             </p>
           </div>
 
@@ -451,10 +477,10 @@ export default function App() {
               onClick={handleQuickTrimRam}
               disabled={trimmingRam || boostingGame || scanning || diagnosing}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 hover:border-cyan-500/50 shadow-md transition-all disabled:opacity-50"
-              title="Aplica EmptyWorkingSet sobre los procesos para liberar RAM sin cerrar aplicaciones"
+              title={t('dashboard', 'quickTrimHelp')}
             >
               <Zap className={`h-4 w-4 ${trimmingRam ? 'animate-spin' : ''}`} />
-              <span>{trimmingRam ? "Vaciando RAM..." : "Optimizar Memoria RAM"}</span>
+              <span>{trimmingRam ? t('dashboard', 'trimming') : t('dashboard', 'quickTrimBtn')}</span>
             </button>
 
             {/* Game Boost CTA */}
@@ -462,10 +488,10 @@ export default function App() {
               onClick={handleGameBoost}
               disabled={boostingGame || trimmingRam || scanning || diagnosing}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-700 via-indigo-600 to-amber-500 hover:from-purple-600 hover:to-amber-400 text-white shadow-lg shadow-purple-900/30 transition-all disabled:opacity-50"
-              title="Vaciado de memoria física y reducción de prioridad CPU en aplicaciones secundarias para maximizar FPS en juegos"
+              title={t('dashboard', 'gameBoostHelp')}
             >
               <Rocket className={`h-4 w-4 ${boostingGame ? 'animate-spin' : ''}`} />
-              <span>{boostingGame ? "Aplicando Boost..." : "🚀 Game Boost"}</span>
+              <span>{boostingGame ? t('dashboard', 'boosting') : t('dashboard', 'gameBoostBtn')}</span>
             </button>
 
             {/* Iniciar Examen Extenso CTA */}
@@ -475,7 +501,7 @@ export default function App() {
               className="flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-xl shadow-indigo-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               <Play className={`h-4 w-4 fill-current ${scanning || diagnosing ? 'animate-spin' : 'group-hover:scale-110 transition-transform'}`} />
-              <span>{scanning ? "Escaneando..." : diagnosing ? "Analizando..." : "Iniciar Examen Extenso"}</span>
+              <span>{scanning ? t('dashboard', 'scanning') : diagnosing ? t('dashboard', 'analyzing') : t('dashboard', 'startExamBtn')}</span>
             </button>
           </div>
         </div>
@@ -513,7 +539,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800/60 py-4 px-6 text-center text-xs text-slate-400">
-        OptimaAI System Optimizer • Powered by Ollama Local LLMs • Safe List Enforced
+        {t('dashboard', 'footer')}
       </footer>
 
       {/* Pro Activation & Patreon Modal */}
@@ -530,6 +556,14 @@ export default function App() {
           showToast("Licencia Pro desactivada.", 'info');
         }}
       />
+
+      {/* In-App Auto-Updater Modal */}
+      <UpdateModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+        updateInfo={updateInfo}
+      />
+
 
     </div>
   );

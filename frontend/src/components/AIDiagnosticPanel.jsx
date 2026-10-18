@@ -1,7 +1,10 @@
 import React from 'react';
 import { Sparkles, CheckCircle2, AlertTriangle, AlertOctagon, Clock } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function AIDiagnosticPanel({ diagnosis, scanning, diagnosing }) {
+  const { t } = useLanguage();
+
   if (scanning || diagnosing) {
     return (
       <div className="glass-panel rounded-2xl p-8 text-center relative overflow-hidden">
@@ -31,9 +34,9 @@ export default function AIDiagnosticPanel({ diagnosis, scanning, diagnosing }) {
         <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto mb-3">
           <Sparkles className="h-6 w-6" />
         </div>
-        <h3 className="text-lg font-semibold text-white">Examen del Sistema Pendiente</h3>
+        <h3 className="text-lg font-semibold text-white">{t('diagnostic', 'title')}</h3>
         <p className="text-sm text-slate-400 max-w-md mx-auto mt-1">
-          Inicia un examen extenso para que el modelo local de Ollama evalúe en tiempo real los procesos anómalos y recomiende acciones de optimización.
+          {t('diagnostic', 'subtitle')}
         </p>
       </div>
     );
@@ -44,19 +47,19 @@ export default function AIDiagnosticPanel({ diagnosis, scanning, diagnosing }) {
       case 'critical':
         return {
           icon: AlertOctagon,
-          text: 'Crítico / Anomalía Alta',
+          text: t('diagnostic', 'healthCritical'),
           classes: 'bg-rose-500/10 text-rose-400 border-rose-500/30'
         };
       case 'caution':
         return {
           icon: AlertTriangle,
-          text: 'Precaución / Consumo Elevado',
+          text: t('diagnostic', 'healthModerate'),
           classes: 'bg-amber-500/10 text-amber-400 border-amber-500/30'
         };
       default:
         return {
           icon: CheckCircle2,
-          text: 'Seguro / Rendimiento Estable',
+          text: t('diagnostic', 'healthOptimal'),
           classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
         };
     }
@@ -112,7 +115,6 @@ export default function AIDiagnosticPanel({ diagnosis, scanning, diagnosing }) {
   };
 
   const formatInlineStyles = (content) => {
-    // Basic bold **text** replacement
     const parts = content.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, i) => {
       if (part.startsWith('**') && part.endsWith('**')) {
@@ -132,8 +134,10 @@ export default function AIDiagnosticPanel({ diagnosis, scanning, diagnosing }) {
             <Sparkles className="h-4 w-4 text-white" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-white">Diagnóstico del Modelo Local</h3>
-            <p className="text-xs text-slate-400">Generado mediante inferencia estructurada en tiempo real</p>
+            <h3 className="text-base font-bold text-white">{t('diagnostic', 'analysisSummary')}</h3>
+            <p className="text-xs text-slate-400">
+              {diagnosis.is_heuristic ? t('header', 'heuristicMode') : `Ollama (${diagnosis.model_used})`}
+            </p>
           </div>
         </div>
 

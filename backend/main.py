@@ -77,6 +77,9 @@ class ToggleOverlayRequest(BaseModel):
     enabled: bool
     position: Optional[str] = "top-right"
 
+class IgnoreProcessRequest(BaseModel):
+    name: str
+
 def add_log_entry(entry: Dict[str, Any]):
     audit_logger.add_entry(entry)
 
@@ -156,6 +159,23 @@ def remove_custom_game_target(name: Optional[str] = None, req: Optional[CustomGa
     target = name or (req.name if req else "")
     if target:
         game_detector.remove_custom_game(target)
+    return game_detector.get_status().model_dump()
+
+@app.post("/api/game-detector/ignore")
+def ignore_process_target(req: IgnoreProcessRequest):
+    """
+    Ignores a process so the game detector never flags it as a game.
+    Immediately discards the process if currently running.
+    """
+    game_detector.ignore_process(req.name)
+    return game_detector.get_status().model_dump()
+
+@app.post("/api/game-detector/unignore")
+def unignore_process_target(req: IgnoreProcessRequest):
+    """
+    Removes a process from the ignored list.
+    """
+    game_detector.unignore_process(req.name)
     return game_detector.get_status().model_dump()
 
 @app.get("/api/gaming/telemetry")

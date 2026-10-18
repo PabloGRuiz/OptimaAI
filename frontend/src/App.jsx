@@ -164,6 +164,36 @@ export default function App() {
     }
   };
 
+  const handleIgnoreProcess = async (name) => {
+    try {
+      const res = await fetch('/api/game-detector/ignore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      const data = await res.json();
+      setDetectorStatus(data);
+      showToast(`'${name}' añadido a procesos ignorados. El centinela continuará buscando.`, 'info');
+    } catch (e) {
+      showToast("Error al ignorar proceso.", 'error');
+    }
+  };
+
+  const handleUnignoreProcess = async (name) => {
+    try {
+      const res = await fetch('/api/game-detector/unignore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      const data = await res.json();
+      setDetectorStatus(data);
+      showToast(`'${name}' removido de ignorados.`, 'info');
+    } catch (e) {
+      showToast("Error al remover proceso ignorado.", 'error');
+    }
+  };
+
   useEffect(() => {
     fetchStatus();
     fetchModels();
@@ -398,6 +428,8 @@ export default function App() {
           onToggleDetector={handleToggleDetector}
           onAddCustomGame={handleAddCustomGame}
           onRemoveCustomGame={handleRemoveCustomGame}
+          onIgnoreProcess={handleIgnoreProcess}
+          onUnignoreProcess={handleUnignoreProcess}
           onOpenProModal={() => setIsProModalOpen(true)}
         />
 

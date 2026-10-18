@@ -14,7 +14,8 @@ import {
   Layers,
   Cpu,
   Flame,
-  Gauge
+  Gauge,
+  EyeOff
 } from 'lucide-react';
 
 export default function SmartGameBoostCard({
@@ -22,6 +23,8 @@ export default function SmartGameBoostCard({
   onToggleDetector,
   onAddCustomGame,
   onRemoveCustomGame,
+  onIgnoreProcess,
+  onUnignoreProcess,
   onOpenProModal
 }) {
   const [showConfig, setShowConfig] = useState(false);
@@ -36,6 +39,7 @@ export default function SmartGameBoostCard({
   const isEnabled = detectorStatus?.enabled;
   const activeGame = detectorStatus?.active_game;
   const customGames = detectorStatus?.custom_games || [];
+  const ignoredProcesses = detectorStatus?.ignored_processes || [];
 
   // Polling for live cross-vendor GPU, VRAM, and FPS telemetry
   useEffect(() => {
@@ -212,6 +216,14 @@ export default function SmartGameBoostCard({
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => onIgnoreProcess && onIgnoreProcess(activeGame.name)}
+                title="Si este proceso no es un juego, haz clic para ignorarlo y permitir que el centinela busque tu juego real"
+                className="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 transition-all shadow-sm"
+              >
+                <EyeOff className="h-3.5 w-3.5" />
+                <span>No es un juego (Ignorar)</span>
+              </button>
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                 <Activity className="h-3.5 w-3.5" />
                 <span>Modo Juego Activo</span>
@@ -454,6 +466,42 @@ export default function SmartGameBoostCard({
               No tienes ejecutables manuales añadidos aún. Cualquier juego de Steam, Epic o Riot se detectará de forma nativa.
             </p>
           )}
+
+          {/* Ignored Processes Section */}
+          <div className="pt-3 border-t border-slate-800/60">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <EyeOff className="h-3.5 w-3.5 text-rose-400" />
+                <span>Procesos Ignorados (Excluidos de Detección)</span>
+              </h4>
+              <span className="text-[10px] text-slate-500">
+                Procesos en segundo plano que nunca serán considerados juegos
+              </span>
+            </div>
+            {ignoredProcesses.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {ignoredProcesses.map((proc) => (
+                  <span
+                    key={proc}
+                    className="px-2.5 py-0.5 rounded-md bg-rose-950/40 border border-rose-800/40 text-xs font-mono text-rose-300 flex items-center gap-1.5"
+                  >
+                    <span>{proc}</span>
+                    <button
+                      onClick={() => onUnignoreProcess && onUnignoreProcess(proc)}
+                      className="text-rose-400/70 hover:text-rose-300 transition-colors"
+                      title={`Remover de ignorados`}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[11px] text-slate-500 italic">
+                No hay procesos ignorados actualmente. Si algún programa secundario es detectado erróneamente, puedes descartarlo.
+              </p>
+            )}
+          </div>
         </div>
       )}
 

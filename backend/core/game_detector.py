@@ -4,11 +4,13 @@ Monitors active processes in real time to detect games from Steam, Epic Games,
 Riot Games, Battle.net, Xbox, and custom directories.
 Automatically triggers Game Boost when a game starts, elevates game CPU priority,
 and restores normal system priorities when the game closes.
+Includes strict filtering to prevent false positives from background tools (e.g., Wallpaper Engine, Soundpad).
 """
 
 from __future__ import annotations
 import os
 import sys
+import json
 import time
 import threading
 from pathlib import Path
@@ -18,7 +20,7 @@ import psutil
 from pydantic import BaseModel, Field
 
 from backend.core.security import security_manager
-from backend.core.license_manager import license_manager
+from backend.core.license_manager import license_manager, get_appdata_dir
 
 # Common game directory markers (case-insensitive substring in exe path)
 GAME_DIRECTORY_MARKERS = [
@@ -34,16 +36,52 @@ GAME_DIRECTORY_MARKERS = [
     r"\juegos",
 ]
 
-# Excluded launchers & helper web renderers (they are NOT the actual game)
+# Directories that should NEVER be considered games (even if located inside steamapps/common or games)
+NON_GAME_PATH_MARKERS = [
+    r"wallpaper_engine",
+    r"steamvr",
+    r"soundpad",
+    r"aseprite",
+    r"blender",
+    r"obs-studio",
+    r"controller companion",
+    r"lossless scaling",
+    r"losslessscaling",
+    r"_commonredist",
+    r"directx",
+    r"vcredist",
+    r"easyanticheat",
+    r"battleye",
+    r"anticheat",
+    r"\tools",
+    r"\benchmarks",
+]
+
+# Filename substrings that identify utilities, crash handlers, updaters, or background daemons
+NON_GAME_NAME_MARKERS = [
+    "crash", "report", "update", "patch", "unins", "redist", "setup",
+    "launcher", "helper", "service", "handler", "config", "settings",
+    "winrtutil", "webwallpaper", "diagnostics", "benchmark", "touchup",
+    "cleanup", "anticheat", "anti-cheat", "cefsharp", "cef_", "webengine",
+    "vulkaninfo", "dxdiag", "install", "utility", "overlay"
+]
+
+# Excluded launchers, helper processes & utilities (they are NOT the playable game)
 LAUNCHER_EXCLUSIONS: Set[str] = {
+    # Steam & helpers
     "steam.exe",
     "steamwebhelper.exe",
     "steamservice.exe",
     "steamerrorreporter.exe",
+    # Epic
     "epicgameslauncher.exe",
     "epicwebhelper.exe",
+    # Riot
     "riotclientservices.exe",
     "riotclientux.exe",
+    "vgc.exe",
+    "vgtray.exe",
+    # Battle.net & EA & Ubisoft & GOG
     "battlenet.exe",
     "eadesktop.exe",
     "upc.exe",
@@ -51,8 +89,40 @@ LAUNCHER_EXCLUSIONS: Set[str] = {
     "gog galaxy.exe",
     "galaxyclient.exe",
     "galaxyclienthelper.exe",
+    # Wallpaper Engine & companion tools
     "wallpaper32.exe",
     "wallpaper64.exe",
+    "winrtutil64.exe",
+    "winrtutil32.exe",
+    "webwallpaper32.exe",
+    "webwallpaper64.exe",
+    "ui32.exe",
+    "diagnostics32.exe",
+    "diagnostics64.exe",
+    # Anti-cheats
+    "easyanticheat.exe",
+    "easyanticheat_eos.exe",
+    "easyanticheat_setup.exe",
+    "beservice.exe",
+    "battleye.exe",
+    # Utilities & Screen Tools
+    "soundpad.exe",
+    "soundpad_service.exe",
+    "obs64.exe",
+    "obs32.exe",
+    "aseprite.exe",
+    "blender.exe",
+    "losslessscaling.exe",
+    "controllercompanion.exe",
+    "crashpad_handler.exe",
+    "unitycrashhandler64.exe",
+    "unitycrashhandler32.exe",
+    "vulkaninfo.exe",
+    "vulkaninfo32.exe",
+    "dxdiag.exe",
+    "gamelauncher.exe",
+    "launcher.exe",
+    "game_launcher.exe",
 }
 
 # Known popular game executable names
@@ -92,6 +162,38 @@ KNOWN_GAME_BINARIES: Set[str] = {
     "b1-win64-shipping.exe",
 }
 
+def _has_visible_window(pid: int) -> bool:
+    """
+    Checks if the process owns at least one top-level visible window with non-empty title or size.
+    Filters out background services, workers, and invisible helper daemons.
+    """
+    if not sys.platform.startswith("win"):
+        return True
+    try:
+        import ctypes
+        from ctypes import wintypes
+        user32 = ctypes.windll.user32
+
+        found = False
+        def callback(hwnd, extra):
+            nonlocal found
+            if user32.IsWindowVisible(hwnd):
+                w_pid = wintypes.DWORD()
+                user32.GetWindowThreadProcessId(hwnd, ctypes.byref(w_pid))
+                if w_pid.value == pid:
+                    length = user32.GetWindowTextLengthW(hwnd)
+                    if length > 0:
+                        found = True
+                        return False
+            return True
+
+        WNDENUMPROC = ctypes.WINFUNCTYPE(ctypes.c_bool, wintypes.HWND, wintypes.LPARAM)
+        cb = WNDENUMPROC(callback)
+        user32.EnumWindows(cb, 0)
+        return found
+    except Exception:
+        return True
+
 class DetectedGame(BaseModel):
     pid: int
     name: str
@@ -105,6 +207,7 @@ class GameDetectorStatus(BaseModel):
     is_pro: bool = False
     active_game: Optional[DetectedGame] = None
     custom_games: List[str] = Field(default_factory=list)
+    ignored_processes: List[str] = Field(default_factory=list)
     monitored_platforms: List[str] = Field(default_factory=lambda: [
         "Steam", "Epic Games", "Riot Games", "Battle.net", "Xbox App", "Custom Exes"
     ])
@@ -116,11 +219,31 @@ class SmartGameDetector:
         self.auto_overlay: bool = True
         self.active_game: Optional[DetectedGame] = None
         self.custom_games: Set[str] = set()
+        self.ignored_processes: Set[str] = set()
         self._throttled_pids: List[int] = []
         self._last_event: str = "Centinela activo: esperando inicio de juego"
         self._lock = threading.Lock()
         self._stop_event = threading.Event()
         self._worker_thread: Optional[threading.Thread] = None
+        self._storage_file = get_appdata_dir() / "ignored_games.json"
+        self._load_ignored_processes()
+
+    def _load_ignored_processes(self):
+        try:
+            if self._storage_file.exists():
+                with open(self._storage_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, list):
+                        self.ignored_processes = {item.lower() for item in data if isinstance(item, str)}
+        except Exception:
+            self.ignored_processes = set()
+
+    def _save_ignored_processes(self):
+        try:
+            with open(self._storage_file, "w", encoding="utf-8") as f:
+                json.dump(sorted(list(self.ignored_processes)), f, indent=2)
+        except Exception:
+            pass
 
     def start_background_monitor(self):
         """Starts the lightweight background detection thread."""
@@ -149,6 +272,27 @@ class SmartGameDetector:
             return True
         return False
 
+    def ignore_process(self, exe_name: str) -> bool:
+        """Adds a process to the ignored list and immediately discards it if active."""
+        clean = exe_name.strip().lower()
+        if not clean.endswith(".exe"):
+            clean += ".exe"
+        self.ignored_processes.add(clean)
+        self._save_ignored_processes()
+
+        if self.active_game and self.active_game.name.lower() == clean:
+            self._on_game_closed(clean)
+        return True
+
+    def unignore_process(self, exe_name: str) -> bool:
+        """Removes a process from the ignored list."""
+        clean = exe_name.strip().lower()
+        if clean in self.ignored_processes:
+            self.ignored_processes.remove(clean)
+            self._save_ignored_processes()
+            return True
+        return False
+
     def _identify_platform(self, path_str: str) -> str:
         p = path_str.lower()
         if "steamapps" in p:
@@ -169,34 +313,50 @@ class SmartGameDetector:
 
     def _is_game_process(self, proc: psutil.Process) -> tuple[bool, str]:
         """
-        Determines if a process is an active gaming binary.
+        Determines if a process is a legitimate active gaming binary.
         """
         try:
             name = proc.name().lower()
+
+            # Fast exclusion checks
             if name in LAUNCHER_EXCLUSIONS:
                 return False, ""
+            if name in self.ignored_processes:
+                return False, ""
+            if any(marker in name for marker in NON_GAME_NAME_MARKERS):
+                return False, ""
 
-            # 1. Check custom user games
+            # 1. Custom user games (always prioritized)
             if name in self.custom_games:
                 return True, "Juego Personalizado"
 
-            # 2. Check known game executable list
+            # 2. Known game binaries (verified games)
             if name in KNOWN_GAME_BINARIES:
                 return True, "Juego Reconocido"
 
             # 3. Check Unreal Engine / Unity shipping binary patterns
-            if "shipping.exe" in name or "-win64-shipping" in name or "game_win64" in name:
-                return True, "Motor de Juego (UE/Unity)"
+            if ("shipping.exe" in name or "-win64-shipping" in name or "game_win64" in name):
+                if _has_visible_window(proc.pid):
+                    return True, "Motor de Juego (UE/Unity)"
 
-            # 4. Check executable folder path
+            # 4. Check folder path against game directories
             try:
                 exe_path = proc.exe().lower()
+
+                # Verify not inside a blacklisted tool/utility directory
+                for bad_dir in NON_GAME_PATH_MARKERS:
+                    if bad_dir in exe_path:
+                        return False, ""
+
+                # Check if it resides in a recognized game library folder
                 for marker in GAME_DIRECTORY_MARKERS:
                     if marker in exe_path:
-                        # Exclude uninstaller / updater binaries
-                        if not any(k in name for k in ["crash", "report", "update", "patch", "unins", "redist"]):
-                            platform = self._identify_platform(exe_path)
-                            return True, platform
+                        # Must have a visible desktop window to be considered a playable game
+                        if not _has_visible_window(proc.pid):
+                            return False, ""
+
+                        platform = self._identify_platform(exe_path)
+                        return True, platform
             except Exception:
                 pass
 
@@ -248,7 +408,6 @@ class SmartGameDetector:
         from backend.core.executor import action_executor
         from backend.core.audit_logger import audit_logger
 
-        # Only apply full Pro Auto-Boost actions if user is Pro
         is_pro = license_manager.get_status().is_pro
 
         elevated = False
@@ -297,7 +456,7 @@ class SmartGameDetector:
             })
 
     def _on_game_closed(self, game_name: str):
-        """Lifecycle handler when game terminates."""
+        """Lifecycle handler when game terminates or is discarded."""
         now_str = datetime.now().strftime("%H:%M:%S")
         self._restore_system_priorities()
         self.active_game = None
@@ -314,7 +473,7 @@ class SmartGameDetector:
             "timestamp": now_str,
             "type": "smart_game_boost_ended",
             "action_title": f"🎮 Juego finalizado: {game_name}",
-            "summary": "Sesión de juego concluida. Todas las prioridades de aplicaciones en segundo plano fueron restauradas.",
+            "summary": f"Sesión de '{game_name}' concluida. Todas las prioridades de fondo fueron restauradas.",
             "freed_mb": 0.0,
             "technical_explanation": "Restauración de procesos throttled a NORMAL_PRIORITY_CLASS."
         })
@@ -327,13 +486,16 @@ class SmartGameDetector:
                 continue
 
             try:
-                # 1. If we currently have an active game, check if it's still alive
+                # 1. If we currently have an active game, check if it's still alive AND not ignored
                 if self.active_game:
                     still_running = False
                     try:
                         p = psutil.Process(self.active_game.pid)
                         if p.is_running() and p.name().lower() == self.active_game.name.lower():
-                            still_running = True
+                            if self.active_game.name.lower() in self.ignored_processes:
+                                still_running = False
+                            else:
+                                still_running = True
                     except Exception:
                         still_running = False
 
@@ -344,6 +506,8 @@ class SmartGameDetector:
                 # 2. If no game is active, scan processes for new game launches
                 if not self.active_game:
                     for proc in psutil.process_iter(['pid', 'name']):
+                        if self._stop_event.is_set():
+                            break
                         is_game, platform = self._is_game_process(proc)
                         if is_game:
                             exe_path = ""
@@ -362,7 +526,7 @@ class SmartGameDetector:
                             self._on_game_started(new_game)
                             break
 
-            except Exception as e:
+            except Exception:
                 pass
 
             self._stop_event.wait(3.5)
@@ -374,6 +538,7 @@ class SmartGameDetector:
             is_pro=is_pro,
             active_game=self.active_game,
             custom_games=sorted(list(self.custom_games)),
+            ignored_processes=sorted(list(self.ignored_processes)),
             last_event=self._last_event
         )
 

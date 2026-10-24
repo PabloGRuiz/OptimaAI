@@ -448,18 +448,7 @@ export default function App() {
           launching={launchingOllama}
         />
 
-        {/* Smart Game Detection & Auto-Boost Watchdog */}
-        <SmartGameBoostCard
-          detectorStatus={detectorStatus}
-          onToggleDetector={handleToggleDetector}
-          onAddCustomGame={handleAddCustomGame}
-          onRemoveCustomGame={handleRemoveCustomGame}
-          onIgnoreProcess={handleIgnoreProcess}
-          onUnignoreProcess={handleUnignoreProcess}
-          onOpenProModal={() => setIsProModalOpen(true)}
-        />
-
-        {/* Primary Action Controls Bar */}
+        {/* 1. Primary Action Controls Bar */}
         <div className="glass-panel p-4 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-sm font-bold text-[#f3f4f6] flex items-center gap-2">
@@ -506,14 +495,13 @@ export default function App() {
           </div>
         </div>
 
-        {/* AI Diagnostic Summary Card */}
+        {/* 2. AI Diagnostic Summary Card & Detected Issues */}
         <AIDiagnosticPanel
           diagnosis={diagnosis}
           scanning={scanning}
           diagnosing={diagnosing}
         />
 
-        {/* Actionable Detected Issues List with Execution */}
         {diagnosis?.detected_issues && (
           <ActionList
             issues={diagnosis.detected_issues}
@@ -522,6 +510,17 @@ export default function App() {
             executionResult={executionResult}
           />
         )}
+
+        {/* 3. Smart Game Detection & Auto-Boost Watchdog */}
+        <SmartGameBoostCard
+          detectorStatus={detectorStatus}
+          onToggleDetector={handleToggleDetector}
+          onAddCustomGame={handleAddCustomGame}
+          onRemoveCustomGame={handleRemoveCustomGame}
+          onIgnoreProcess={handleIgnoreProcess}
+          onUnignoreProcess={handleUnignoreProcess}
+          onOpenProModal={() => setIsProModalOpen(true)}
+        />
 
         {/* Real-time Activity, Optimization & Security Decision Log */}
         <ActivityLogPanel

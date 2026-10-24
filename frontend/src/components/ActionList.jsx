@@ -24,16 +24,15 @@ export default function ActionList({
 
   if (!issues || issues.length === 0) {
     return (
-      <div className="glass-panel rounded-2xl p-6 text-center">
-        <CheckCircle className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-        <h4 className="text-sm font-semibold text-white">{t('actions', 'emptyTitle')}</h4>
-        <p className="text-xs text-slate-400 mt-1">
+      <div className="glass-panel p-6 text-center">
+        <CheckCircle className="h-7 w-7 text-xbox-light mx-auto mb-2" />
+        <h4 className="text-sm font-semibold text-ink-primary">{t('actions', 'emptyTitle')}</h4>
+        <p className="text-xs text-ink-secondary mt-1">
           {t('actions', 'emptyDesc')}
         </p>
       </div>
     );
   }
-
 
   const togglePid = (pid, isSafe) => {
     if (!isSafe) return;
@@ -76,18 +75,18 @@ export default function ActionList({
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-6 relative">
+    <div className="glass-panel p-5 relative">
       
       {/* Title & Bulk Selection */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-line-subtle">
         <div>
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <h3 className="text-sm font-bold text-ink-primary flex items-center gap-2">
             <span>{t('actions', 'title')}</span>
-            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+            <span className="badge-mono text-[11px]">
               {issues.length} {t('actions', 'detectedCount', 'detectadas')}
             </span>
           </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-ink-secondary mt-0.5">
             {t('actions', 'subtitle')}
           </p>
         </div>
@@ -95,13 +94,13 @@ export default function ActionList({
         <div className="flex items-center gap-2">
           <button
             onClick={selectAllSafe}
-            className="text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition"
+            className="btn-dark-subtle text-xs px-2.5 py-1"
           >
             {t('actions', 'selectSafe')}
           </button>
           <button
             onClick={deselectAll}
-            className="text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition"
+            className="btn-dark-subtle text-xs px-2.5 py-1"
           >
             {t('actions', 'deselectAll')}
           </button>
@@ -109,7 +108,7 @@ export default function ActionList({
       </div>
 
       {/* List of Detected Issues */}
-      <div className="space-y-2.5">
+      <div className="space-y-2">
         {issues.map((issue) => {
           const isSelected = selectedPids.has(issue.pid);
           const isSafe = issue.is_safe_to_execute;
@@ -118,12 +117,12 @@ export default function ActionList({
             <div
               key={issue.pid}
               onClick={() => togglePid(issue.pid, isSafe)}
-              className={`p-3.5 rounded-xl border transition-all flex items-center justify-between gap-4 cursor-pointer ${
+              className={`p-3 rounded-card border transition-all flex items-center justify-between gap-4 cursor-pointer ${
                 !isSafe
-                  ? 'bg-slate-900/40 border-slate-800/80 opacity-60 cursor-not-allowed'
+                  ? 'bg-surface-ground/50 border-line-subtle opacity-60 cursor-not-allowed'
                   : isSelected
-                  ? 'bg-indigo-950/20 border-indigo-500/50 shadow-sm shadow-indigo-500/10'
-                  : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700'
+                  ? 'bg-[#121f17] border-xbox-core shadow-sm shadow-xbox-core/15'
+                  : 'bg-surface-card border-line-subtle hover:bg-surface-raised hover:border-line-divider'
               }`}
             >
               {/* Left: Checkbox & Process Details */}
@@ -133,32 +132,32 @@ export default function ActionList({
                   checked={isSelected}
                   disabled={!isSafe}
                   onChange={() => {}} // handled by parent div
-                  className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-600 focus:ring-0 focus:ring-offset-0 cursor-pointer disabled:cursor-not-allowed"
+                  className="h-4 w-4 rounded-sm border-line-divider bg-surface-ground text-xbox-core focus:ring-0 focus:ring-offset-0 cursor-pointer disabled:cursor-not-allowed accent-[#107C41]"
                 />
 
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-bold text-white truncate">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono text-xs font-bold text-ink-primary truncate">
                       {issue.process_name}
                     </span>
-                    <span className="text-xs font-mono text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded">
+                    <span className="text-[11px] font-mono text-ink-secondary bg-surface-ground px-1.5 py-0.5 rounded-sm border border-line-subtle">
                       PID: {issue.pid}
                     </span>
                     {isSafe ? (
-                      <span className="flex items-center gap-1 text-[11px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      <span className="flex items-center gap-1 text-[11px] font-medium text-xbox-light bg-[#141f17] px-2 py-0.5 rounded-md border border-[#107C41]/30">
                         <ShieldCheck className="h-3 w-3" /> {t('actions', 'safe')}
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-[11px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                      <span className="flex items-center gap-1 text-[11px] font-medium text-ink-secondary bg-surface-raised px-2 py-0.5 rounded-md border border-line-divider">
                         <ShieldAlert className="h-3 w-3" /> {t('actions', 'protected')}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400 truncate mt-1">
+                  <p className="text-xs text-ink-secondary truncate mt-0.5">
                     {issue.reason}
                   </p>
                   {issue.safety_override_note && (
-                    <p className="text-[11px] text-amber-400/90 mt-0.5 flex items-center gap-1">
+                    <p className="text-[11px] text-[#f59e0b] mt-0.5 flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" /> {issue.safety_override_note}
                     </p>
                   )}
@@ -168,12 +167,12 @@ export default function ActionList({
               {/* Right: Action Badge */}
               <div className="flex-shrink-0">
                 <span
-                  className={`text-xs font-bold px-2.5 py-1 rounded-md uppercase tracking-wider ${
+                  className={`text-[11px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider ${
                     issue.recommended_action === 'terminate'
-                      ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                      ? 'bg-[#261416] text-[#ef4444] border border-[#ef4444]/30'
                       : issue.recommended_action === 'trim_memory'
-                      ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                      : 'bg-slate-800 text-slate-400 border border-slate-700'
+                      ? 'bg-[#141f17] text-xbox-light border border-xbox-core/40'
+                      : 'bg-surface-raised text-ink-secondary border border-line-divider'
                   }`}
                 >
                   {issue.recommended_action}
@@ -185,39 +184,39 @@ export default function ActionList({
       </div>
 
       {/* Confirmation & CTA Bar */}
-      <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between">
-        <div className="text-xs text-slate-400">
-          <span className="text-white font-semibold">{selectedPids.size}</span> {t('actions', 'selectedCount')}
+      <div className="mt-5 pt-3.5 border-t border-line-subtle flex items-center justify-between">
+        <div className="text-xs text-ink-secondary">
+          <span className="text-ink-primary font-bold">{selectedPids.size}</span> {t('actions', 'selectedCount')}
         </div>
 
         <button
           disabled={selectedPids.size === 0 || executing}
           onClick={() => setConfirmModalOpen(true)}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="btn-xbox-primary flex items-center gap-2 px-5 py-2 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed shadow-xbox-glow"
         >
-          <Play className="h-4 w-4 fill-current" />
+          <Play className="h-3.5 w-3.5 fill-current" />
           <span>{t('actions', 'executeBtn')}</span>
         </button>
       </div>
 
       {/* Confirmation Modal */}
       {confirmModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <h4 className="text-lg font-bold text-white mb-2">{t('actions', 'confirmTitle')}</h4>
-            <p className="text-sm text-slate-300 leading-relaxed mb-4">
-              {t('actions', 'confirmDesc')} (<strong className="text-indigo-400">{selectedPids.size}</strong>)
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel bg-surface-card border border-line-divider rounded-card max-w-md w-full p-5 shadow-2xl">
+            <h4 className="text-base font-bold text-ink-primary mb-2">{t('actions', 'confirmTitle')}</h4>
+            <p className="text-xs text-ink-secondary leading-relaxed mb-4">
+              {t('actions', 'confirmDesc')} (<strong className="text-ink-primary">{selectedPids.size}</strong>)
             </p>
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex items-center justify-end gap-2.5">
               <button
                 onClick={() => setConfirmModalOpen(false)}
-                className="px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="btn-dark-subtle px-3.5 py-1.5 text-xs font-medium"
               >
                 {t('actions', 'confirmCancel')}
               </button>
               <button
                 onClick={handleConfirmAndRun}
-                className="px-4 py-2 rounded-lg text-sm font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-600/30 transition"
+                className="px-3.5 py-1.5 rounded-btn text-xs font-bold bg-[#ef4444] hover:bg-[#dc2626] text-white shadow-md shadow-rose-950/50 transition"
               >
                 {t('actions', 'confirmExecute')}
               </button>
@@ -228,20 +227,20 @@ export default function ActionList({
 
       {/* Execution Results Feedback Banner */}
       {executionResult && (
-        <div className="mt-4 p-4 rounded-xl bg-slate-900 border border-indigo-500/30">
+        <div className="mt-4 p-3.5 rounded-card bg-surface-ground border border-line-subtle">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
-              <Check className="h-4 w-4 text-emerald-400" /> {t('actions', 'executionSummary')}
+            <h4 className="text-xs font-bold text-ink-primary flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5 text-xbox-light" /> {t('actions', 'executionSummary')}
             </h4>
-            <span className="text-xs text-emerald-400 font-semibold">
+            <span className="text-xs text-xbox-light font-bold font-mono">
               +{executionResult.total_freed_ram_mb} {t('actions', 'freedMb')}
             </span>
           </div>
-          <div className="space-y-1 text-xs text-slate-300">
+          <div className="space-y-1 text-xs text-ink-secondary">
             {executionResult.results?.map((res, i) => (
-              <div key={i} className="flex items-center justify-between py-0.5 border-b border-slate-800/60 last:border-none">
-                <span className="font-mono text-slate-200">{res.process_name} (PID {res.pid})</span>
-                <span className={res.success ? 'text-emerald-400' : 'text-rose-400'}>
+              <div key={i} className="flex items-center justify-between py-0.5 border-b border-line-subtle/50 last:border-none">
+                <span className="font-mono text-ink-primary text-[11px]">{res.process_name} (PID {res.pid})</span>
+                <span className={`text-[11px] font-medium ${res.success ? 'text-xbox-light' : 'text-[#ef4444]'}`}>
                   {res.message}
                 </span>
               </div>

@@ -62,72 +62,69 @@ export default function UpdateModal({ isOpen, onClose, updateInfo, onShowToast }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-2xl rounded-2xl bg-gradient-to-b from-slate-900 via-[#0B0F19] to-slate-950 border border-indigo-500/30 p-6 shadow-2xl shadow-indigo-500/20 text-slate-100 max-h-[90vh] flex flex-col">
-        
-        {/* Glow backdrop */}
-        <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-indigo-500/15 via-cyan-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-2xl rounded-card bg-surface-card border border-line-divider p-6 shadow-2xl text-ink-primary max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex items-start justify-between pb-4 border-b border-slate-800 relative z-10">
+        <div className="flex items-start justify-between pb-4 border-b border-line-subtle relative z-10">
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <ArrowUpCircle className="h-6 w-6 text-white" />
+            <div className="h-10 w-10 rounded-md bg-surface-raised border border-line-subtle flex items-center justify-center shadow-sm text-xbox-light">
+              <ArrowUpCircle className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <h2 className="text-base font-bold text-ink-primary flex items-center gap-2">
                 <span>{t('updater', 'modalTitle')}</span>
-                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                <span className="badge-mono text-[10px]">
                   v{updateInfo.latest_version}
                 </span>
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">{t('updater', 'modalSubtitle')}</p>
+              <p className="text-xs text-ink-secondary mt-0.5">{t('updater', 'modalSubtitle')}</p>
             </div>
           </div>
           <button
             onClick={onClose}
             disabled={updating}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors disabled:opacity-30"
+            className="p-1.5 rounded-btn text-ink-secondary hover:text-ink-primary hover:bg-surface-raised transition-colors disabled:opacity-30"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Version Compare Banner */}
-        <div className="my-4 p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between flex-wrap gap-3 text-xs relative z-10">
+        <div className="my-3.5 p-3 rounded-card bg-surface-ground border border-line-subtle flex items-center justify-between flex-wrap gap-3 text-xs relative z-10">
           <div className="flex items-center gap-2">
-            <span className="text-slate-400">{t('updater', 'currentVersionLabel')}</span>
-            <span className="font-mono font-bold text-slate-300 bg-slate-800 px-2 py-0.5 rounded">
+            <span className="text-ink-secondary">{t('updater', 'currentVersionLabel')}</span>
+            <span className="font-mono font-bold text-ink-primary bg-surface-raised px-2 py-0.5 rounded-sm border border-line-subtle">
               v{updateInfo.current_version}
             </span>
-            <span className="text-slate-500">➔</span>
-            <span className="text-slate-400">{t('updater', 'latestVersionLabel')}</span>
-            <span className="font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+            <span className="text-line-divider">➔</span>
+            <span className="text-ink-secondary">{t('updater', 'latestVersionLabel')}</span>
+            <span className="font-mono font-bold text-xbox-light bg-[#141f17] border border-[#107C41]/30 px-2 py-0.5 rounded-sm">
               v{updateInfo.latest_version}
             </span>
           </div>
           {updateInfo.download_size_mb > 0 && (
-            <div className="text-[11px] text-slate-400 font-mono">
-              {t('updater', 'sizeLabel')} <span className="text-slate-200">{updateInfo.download_size_mb} MB</span>
+            <div className="text-[11px] text-ink-secondary font-mono">
+              {t('updater', 'sizeLabel')} <span className="text-ink-primary">{updateInfo.download_size_mb} MB</span>
             </div>
           )}
         </div>
 
         {/* Release Notes */}
-        <div className="flex-1 overflow-y-auto pr-2 space-y-2 text-xs text-slate-300 relative z-10 my-2">
-          <div className="font-semibold text-slate-200 flex items-center gap-1.5 mb-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+        <div className="flex-1 overflow-y-auto pr-2 space-y-2 text-xs text-ink-secondary relative z-10 my-2">
+          <div className="font-semibold text-ink-primary flex items-center gap-1.5 mb-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-xbox-light" />
             <span>{t('updater', 'whatsNew')}</span>
           </div>
-          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/60 font-mono text-[11px] leading-relaxed whitespace-pre-wrap max-h-56 overflow-y-auto">
+          <div className="p-3.5 rounded-card bg-surface-ground border border-line-subtle font-mono text-[11px] leading-relaxed whitespace-pre-wrap max-h-56 overflow-y-auto text-ink-secondary">
             {updateInfo.release_notes}
           </div>
         </div>
 
         {/* Error message if any */}
         {errorText && (
-          <div className="my-2 p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+          <div className="my-2 p-2.5 rounded-card bg-[#261416] border border-[#ef4444]/30 text-[#ef4444] text-xs flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{errorText}</span>
           </div>
         )}
@@ -135,13 +132,13 @@ export default function UpdateModal({ isOpen, onClose, updateInfo, onShowToast }
         {/* Progress bar during auto update */}
         {updating && (
           <div className="my-3 space-y-2">
-            <div className="flex justify-between text-xs font-mono text-cyan-300">
+            <div className="flex justify-between text-xs font-mono text-xbox-light">
               <span>{statusText}</span>
               <span>{progress}%</span>
             </div>
-            <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+            <div className="w-full h-2 rounded-full bg-surface-ground overflow-hidden border border-line-subtle">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 transition-all duration-300"
+                className="h-full bg-gradient-to-r from-xbox-dark via-xbox-core to-xbox-light transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -149,38 +146,38 @@ export default function UpdateModal({ isOpen, onClose, updateInfo, onShowToast }
         )}
 
         {/* Actions */}
-        <div className="pt-4 border-t border-slate-800 flex items-center justify-between gap-3 relative z-10">
+        <div className="pt-3.5 border-t border-line-subtle flex items-center justify-between gap-3 relative z-10">
           <a
             href={updateInfo.release_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1.5 transition-colors"
+            className="text-xs text-ink-secondary hover:text-ink-primary flex items-center gap-1.5 transition-colors"
           >
             <ExternalLink className="h-3.5 w-3.5" />
             <span>{t('updater', 'openReleasePage')}</span>
           </a>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={onClose}
               disabled={updating}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors disabled:opacity-30"
+              className="btn-dark-subtle px-3.5 py-1.5 text-xs font-semibold disabled:opacity-30"
             >
               {t('updater', 'remindLater')}
             </button>
             <button
               onClick={handleApplyUpdate}
               disabled={updating}
-              className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-500/25 flex items-center gap-2 disabled:opacity-60 transition-all hover:scale-105"
+              className="btn-xbox-primary px-4 py-1.5 text-xs font-bold flex items-center gap-2 disabled:opacity-60"
             >
               {updating ? (
                 <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
                   <span>{t('updater', 'updatingBtn')}</span>
                 </>
               ) : (
                 <>
-                  <Download className="h-4 w-4" />
+                  <Download className="h-3.5 w-3.5" />
                   <span>{t('updater', 'updateNowBtn')}</span>
                 </>
               )}

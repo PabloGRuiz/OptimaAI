@@ -217,51 +217,47 @@ export default function OverlaySettingsModal({
   const hotkeyOptions = ['F7', 'F8', 'F9', 'F10', 'F11', 'F12'];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in text-slate-100">
-      <div className="relative w-full max-w-2xl bg-gradient-to-br from-slate-900/98 via-[#0b101e]/98 to-slate-900/98 border border-indigo-500/40 rounded-3xl p-6 shadow-2xl shadow-indigo-500/20 max-h-[94vh] flex flex-col overflow-hidden">
-        
-        {/* Ambient glow */}
-        <div className="absolute -top-24 -right-24 w-60 h-60 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in text-ink-primary">
+      <div className="relative w-full max-w-2xl bg-surface-card border border-line-divider rounded-card p-6 shadow-2xl max-h-[94vh] flex flex-col overflow-hidden">
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-line-subtle">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <Sliders className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 rounded-md bg-surface-raised border border-line-subtle flex items-center justify-center shadow-sm text-xbox-light">
+              <Sliders className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white tracking-tight">
+              <h2 className="text-base font-bold text-ink-primary tracking-tight">
                 {t('overlaySettings', 'modalTitle', 'Personalizar Posición & Atajos del HUD')}
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-ink-secondary">
                 {t('overlaySettings', 'modalSubtitle', 'Arrastra el overlay libremente en el monitor o usa anclajes rápidos')}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-btn text-ink-secondary hover:text-ink-primary hover:bg-surface-raised transition-colors"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto py-4 space-y-4 pr-1">
+        <div className="flex-1 overflow-y-auto py-3.5 space-y-3.5 pr-1">
 
           {/* Screen Resolution Badge */}
-          <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-950/70 border border-slate-800 text-xs">
+          <div className="flex items-center justify-between px-3.5 py-2 rounded-card bg-surface-ground border border-line-subtle text-xs">
             <div className="flex items-center gap-2">
-              <Monitor className="h-4 w-4 text-cyan-400" />
-              <span className="text-slate-300 font-medium">
+              <Monitor className="h-4 w-4 text-xbox-light" />
+              <span className="text-ink-secondary font-medium">
                 {t('overlaySettings', 'displayInfo', 'Monitor Principal Detectado')}:
               </span>
-              <span className="font-mono font-bold text-cyan-300">
+              <span className="font-mono font-bold text-ink-primary">
                 {screenWidth} × {screenHeight} @ {refreshRate}Hz
               </span>
             </div>
-            <span className="text-[11px] font-mono text-indigo-400 font-semibold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+            <span className="badge-mono text-[10px]">
               Escala Nativa 1:1
             </span>
           </div>
@@ -269,39 +265,39 @@ export default function OverlaySettingsModal({
           {/* VIRTUAL MONITOR CANVAS */}
           <div className="flex flex-col items-center">
             <div className="text-center mb-1.5">
-              <span className="text-xs text-slate-400 flex items-center justify-center gap-1.5">
-                <Move className="h-3.5 w-3.5 text-indigo-400 animate-pulse" />
+              <span className="text-xs text-ink-secondary flex items-center justify-center gap-1.5">
+                <Move className="h-3.5 w-3.5 text-xbox-light animate-pulse" />
                 {t('overlaySettings', 'dragHelp', 'Arrastra el recuadro o haz clic en cualquier zona de la pantalla')}
               </span>
             </div>
 
             {/* Monitor Bezel */}
-            <div className="relative p-2.5 rounded-2xl bg-gradient-to-b from-slate-800 via-slate-850 to-slate-900 border-2 border-slate-700 shadow-2xl">
+            <div className="relative p-2 rounded-card bg-[#121214] border border-line-subtle shadow-xl">
               
               {/* Webcam dot */}
-              <div className="absolute top-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-slate-600" />
+              <div className="absolute top-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-line-divider" />
 
               {/* Monitor Screen Glass */}
               <div
                 ref={screenBoxRef}
                 onClick={handleScreenClick}
                 style={{ width: `${previewWidth}px`, height: `${previewHeight}px` }}
-                className="relative bg-gradient-to-br from-[#070b14] via-[#0d1629] to-[#080d1a] rounded-lg overflow-hidden border border-slate-700/80 shadow-inner select-none cursor-crosshair"
+                className="relative bg-[#0c0c0e] rounded-md overflow-hidden border border-line-subtle select-none cursor-crosshair"
               >
                 {/* Subtle desktop grid pattern */}
-                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+                <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#2d2d34_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
 
                 {/* Quick Anchor Target Markers */}
-                <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-2 opacity-40">
+                <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-2 opacity-30">
                   <div className="flex justify-between">
-                    <span className="h-2 w-2 rounded-full border border-dashed border-slate-400" />
-                    <span className="h-2 w-2 rounded-full border border-dashed border-slate-400" />
-                    <span className="h-2 w-2 rounded-full border border-dashed border-slate-400" />
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-ink-secondary" />
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-ink-secondary" />
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-ink-secondary" />
                   </div>
                   <div className="flex justify-between">
-                    <span className="h-2 w-2 rounded-full border border-dashed border-slate-400" />
-                    <span className="h-2 w-2 rounded-full border border-dashed border-slate-400" />
-                    <span className="h-2 w-2 rounded-full border border-dashed border-slate-400" />
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-ink-secondary" />
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-ink-secondary" />
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-ink-secondary" />
                   </div>
                 </div>
 
@@ -315,36 +311,36 @@ export default function OverlaySettingsModal({
                     width: `${miniCardWidth}px`,
                     height: `${miniCardHeight}px`
                   }}
-                  className={`rounded-lg border-2 shadow-xl cursor-grab active:cursor-grabbing transition-shadow flex items-center justify-between px-2 text-[10px] font-mono select-none ${
+                  className={`rounded-md border shadow-xl cursor-grab active:cursor-grabbing transition-shadow flex items-center justify-between px-2 text-[10px] font-mono select-none ${
                     activeThemeColor.bg
                   } ${activeThemeColor.border} ${activeThemeColor.glow} ${
-                    isDragging ? 'ring-2 ring-indigo-400 scale-105 z-20' : ''
+                    isDragging ? 'ring-2 ring-xbox-light scale-105 z-20' : ''
                   }`}
                 >
                   <div className="flex items-center gap-1 overflow-hidden pointer-events-none">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-xbox-light animate-pulse" />
                     <span className={`font-bold ${activeThemeColor.text}`}>FPS: {refreshRate}</span>
                   </div>
                   {layout === 'full' && (
-                    <span className="text-slate-400 text-[9px] pointer-events-none">1%: {Math.round(refreshRate * 0.85)}</span>
+                    <span className="text-ink-secondary text-[9px] pointer-events-none">1%: {Math.round(refreshRate * 0.85)}</span>
                   )}
                 </div>
               </div>
 
               {/* Monitor Stand */}
-              <div className="mx-auto w-16 h-2.5 bg-gradient-to-b from-slate-700 to-slate-800 rounded-b-md" />
-              <div className="mx-auto w-28 h-1.5 bg-slate-800 rounded-full mt-1.5" />
+              <div className="mx-auto w-16 h-2 bg-surface-raised rounded-b-sm border-t border-line-subtle" />
+              <div className="mx-auto w-24 h-1 bg-surface-raised rounded-full mt-1 border border-line-subtle" />
             </div>
 
             {/* Position Readout Coordinates */}
-            <div className="mt-2.5 flex items-center justify-between w-full max-w-[520px] px-2 text-xs font-mono">
-              <span className="text-cyan-400 font-bold flex items-center gap-1.5">
-                <Compass className="h-3.5 w-3.5 text-cyan-400" />
+            <div className="mt-2 flex items-center justify-between w-full max-w-[520px] px-2 text-xs font-mono">
+              <span className="text-xbox-light font-bold flex items-center gap-1.5">
+                <Compass className="h-3.5 w-3.5 text-xbox-light" />
                 {position === 'custom'
                   ? `Posición Manual: X = ${activeRealX}px, Y = ${activeRealY}px`
                   : `Anclaje Automático: ${position.toUpperCase()}`}
               </span>
-              <span className="text-slate-400 text-[11px]">
+              <span className="text-ink-secondary text-[11px]">
                 {cardPixelWidth} × {cardPixelHeight} px ({layout})
               </span>
             </div>
@@ -352,66 +348,66 @@ export default function OverlaySettingsModal({
 
           {/* QUICK SNAP PRESET BUTTONS */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-300">
+            <label className="text-xs font-bold text-ink-primary">
               {t('overlaySettings', 'snapTitle', 'Anclajes Rápidos')}
             </label>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               <button
                 onClick={() => handleSnap('top-left')}
-                className={`py-1.5 px-2 rounded-xl text-xs font-medium border transition-all ${
+                className={`py-1.5 px-2 rounded-btn text-xs font-medium border transition-all ${
                   position === 'top-left'
-                    ? 'bg-indigo-600 text-white border-indigo-500 font-bold shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
+                    ? 'bg-xbox-core text-white border-xbox-core font-bold shadow-xbox-glow'
+                    : 'bg-surface-ground text-ink-secondary border-line-subtle hover:text-ink-primary hover:bg-surface-raised'
                 }`}
               >
                 ↖ {t('overlaySettings', 'snapTopLeft', 'Sup-Izq')}
               </button>
               <button
                 onClick={() => handleSnap('top-center')}
-                className={`py-1.5 px-2 rounded-xl text-xs font-medium border transition-all ${
+                className={`py-1.5 px-2 rounded-btn text-xs font-medium border transition-all ${
                   position === 'top-center'
-                    ? 'bg-indigo-600 text-white border-indigo-500 font-bold shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
+                    ? 'bg-xbox-core text-white border-xbox-core font-bold shadow-xbox-glow'
+                    : 'bg-surface-ground text-ink-secondary border-line-subtle hover:text-ink-primary hover:bg-surface-raised'
                 }`}
               >
                 ⬆ {t('overlaySettings', 'snapTopCenter', 'Sup-Centro')}
               </button>
               <button
                 onClick={() => handleSnap('top-right')}
-                className={`py-1.5 px-2 rounded-xl text-xs font-medium border transition-all ${
+                className={`py-1.5 px-2 rounded-btn text-xs font-medium border transition-all ${
                   position === 'top-right'
-                    ? 'bg-indigo-600 text-white border-indigo-500 font-bold shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
+                    ? 'bg-xbox-core text-white border-xbox-core font-bold shadow-xbox-glow'
+                    : 'bg-surface-ground text-ink-secondary border-line-subtle hover:text-ink-primary hover:bg-surface-raised'
                 }`}
               >
                 ↗ {t('overlaySettings', 'snapTopRight', 'Sup-Der')}
               </button>
               <button
                 onClick={() => handleSnap('bottom-left')}
-                className={`py-1.5 px-2 rounded-xl text-xs font-medium border transition-all ${
+                className={`py-1.5 px-2 rounded-btn text-xs font-medium border transition-all ${
                   position === 'bottom-left'
-                    ? 'bg-indigo-600 text-white border-indigo-500 font-bold shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
+                    ? 'bg-xbox-core text-white border-xbox-core font-bold shadow-xbox-glow'
+                    : 'bg-surface-ground text-ink-secondary border-line-subtle hover:text-ink-primary hover:bg-surface-raised'
                 }`}
               >
                 ↙ {t('overlaySettings', 'snapBottomLeft', 'Inf-Izq')}
               </button>
               <button
                 onClick={() => handleSnap('bottom-center')}
-                className={`py-1.5 px-2 rounded-xl text-xs font-medium border transition-all ${
+                className={`py-1.5 px-2 rounded-btn text-xs font-medium border transition-all ${
                   position === 'bottom-center'
-                    ? 'bg-indigo-600 text-white border-indigo-500 font-bold shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
+                    ? 'bg-xbox-core text-white border-xbox-core font-bold shadow-xbox-glow'
+                    : 'bg-surface-ground text-ink-secondary border-line-subtle hover:text-ink-primary hover:bg-surface-raised'
                 }`}
               >
                 ⬇ {t('overlaySettings', 'snapBottomCenter', 'Inf-Centro')}
               </button>
               <button
                 onClick={() => handleSnap('bottom-right')}
-                className={`py-1.5 px-2 rounded-xl text-xs font-medium border transition-all ${
+                className={`py-1.5 px-2 rounded-btn text-xs font-medium border transition-all ${
                   position === 'bottom-right'
-                    ? 'bg-indigo-600 text-white border-indigo-500 font-bold shadow-md shadow-indigo-600/30'
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
+                    ? 'bg-xbox-core text-white border-xbox-core font-bold shadow-xbox-glow'
+                    : 'bg-surface-ground text-ink-secondary border-line-subtle hover:text-ink-primary hover:bg-surface-raised'
                 }`}
               >
                 ↘ {t('overlaySettings', 'snapBottomRight', 'Inf-Der')}
@@ -420,24 +416,24 @@ export default function OverlaySettingsModal({
           </div>
 
           {/* HOTKEYS CONFIGURATION */}
-          <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2.5">
+          <div className="p-3.5 rounded-card bg-surface-ground border border-line-subtle space-y-2.5">
             <div className="flex items-center gap-2">
-              <Keyboard className="h-4 w-4 text-purple-400" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+              <Keyboard className="h-4 w-4 text-xbox-light" />
+              <h3 className="text-xs font-bold text-ink-primary uppercase tracking-wider">
                 {t('overlaySettings', 'hotkeysTitle', 'Atajos de Teclado Globales (En el Juego)')}
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
               {/* Overlay Toggle Key */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-                <span className="text-xs text-slate-300">
+              <div className="flex items-center justify-between p-2.5 rounded-card bg-surface-card border border-line-subtle">
+                <span className="text-xs text-ink-secondary">
                   {t('overlaySettings', 'hotkeyOverlay', 'Mostrar / Ocultar HUD')}
                 </span>
                 <select
                   value={overlayHotkey}
                   onChange={(e) => setOverlayHotkey(e.target.value)}
-                  className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-700 text-xs font-mono font-bold text-indigo-400 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  className="px-2.5 py-1 rounded-btn bg-surface-ground border border-line-divider text-xs font-mono font-bold text-ink-primary focus:outline-none focus:border-xbox-core cursor-pointer"
                 >
                   {hotkeyOptions.map((k) => (
                     <option key={k} value={k}>
@@ -448,14 +444,14 @@ export default function OverlaySettingsModal({
               </div>
 
               {/* Benchmark Toggle Key */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-                <span className="text-xs text-slate-300">
+              <div className="flex items-center justify-between p-2.5 rounded-card bg-surface-card border border-line-subtle">
+                <span className="text-xs text-ink-secondary">
                   {t('overlaySettings', 'hotkeyBenchmark', 'Iniciar / Detener Benchmark')}
                 </span>
                 <select
                   value={benchmarkHotkey}
                   onChange={(e) => setBenchmarkHotkey(e.target.value)}
-                  className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-700 text-xs font-mono font-bold text-yellow-400 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  className="px-2.5 py-1 rounded-btn bg-surface-ground border border-line-divider text-xs font-mono font-bold text-xbox-light focus:outline-none focus:border-xbox-core cursor-pointer"
                 >
                   {hotkeyOptions.map((k) => (
                     <option key={k} value={k}>
@@ -467,18 +463,18 @@ export default function OverlaySettingsModal({
             </div>
 
             {/* Sound confirmation toggle */}
-            <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+            <div className="flex items-center justify-between pt-1 border-t border-line-subtle">
               <div className="flex items-center gap-2">
                 {soundEnabled ? (
-                  <Volume2 className="h-4 w-4 text-emerald-400" />
+                  <Volume2 className="h-4 w-4 text-xbox-light" />
                 ) : (
-                  <VolumeX className="h-4 w-4 text-slate-500" />
+                  <VolumeX className="h-4 w-4 text-ink-secondary" />
                 )}
                 <div>
-                  <span className="text-xs font-medium text-slate-300">
+                  <span className="text-xs font-medium text-ink-primary">
                     {t('overlaySettings', 'soundTone', 'Confirmación Sonora (Beep)')}
                   </span>
-                  <p className="text-[10px] text-slate-500">
+                  <p className="text-[10px] text-ink-secondary">
                     {t('overlaySettings', 'soundToneHelp', 'Emite un sutil beep de confirmación al presionar los atajos')}
                   </p>
                 </div>
@@ -486,7 +482,7 @@ export default function OverlaySettingsModal({
               <button
                 onClick={() => setSoundEnabled(!soundEnabled)}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  soundEnabled ? 'bg-indigo-600' : 'bg-slate-800'
+                  soundEnabled ? 'bg-xbox-core' : 'bg-surface-raised'
                 }`}
               >
                 <span
@@ -501,68 +497,68 @@ export default function OverlaySettingsModal({
           {/* THEME & LAYOUT SELECTORS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Theme */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
-                <Palette className="h-3.5 w-3.5 text-cyan-400" />
+            <div className="p-3.5 rounded-card bg-surface-ground border border-line-subtle space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-ink-primary">
+                <Palette className="h-3.5 w-3.5 text-xbox-light" />
                 <span>{t('overlaySettings', 'themeTitle', 'Tema de Color Neón')}</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => setTheme('cyberpunk')}
-                  className={`py-1.5 px-2 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-all ${
+                  className={`py-1.5 px-2 rounded-btn text-xs font-medium border flex items-center gap-1.5 transition-all ${
                     theme === 'cyberpunk'
-                      ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300 font-bold shadow-sm shadow-emerald-500/20'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-[#141f17] border-xbox-core text-xbox-light font-bold shadow-sm shadow-xbox-core/20'
+                      : 'bg-surface-card border-line-subtle text-ink-secondary hover:text-ink-primary'
                   }`}
                 >
                   <span className="h-2 w-2 rounded-full bg-emerald-400" /> Cyberpunk
                 </button>
                 <button
                   onClick={() => setTheme('cyan')}
-                  className={`py-1.5 px-2 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-all ${
+                  className={`py-1.5 px-2 rounded-btn text-xs font-medium border flex items-center gap-1.5 transition-all ${
                     theme === 'cyan'
                       ? 'bg-cyan-950/60 border-cyan-500 text-cyan-300 font-bold shadow-sm shadow-cyan-500/20'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      : 'bg-surface-card border-line-subtle text-ink-secondary hover:text-ink-primary'
                   }`}
                 >
                   <span className="h-2 w-2 rounded-full bg-cyan-400" /> Cyan Tech
                 </button>
                 <button
                   onClick={() => setTheme('violet')}
-                  className={`py-1.5 px-2 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-all ${
+                  className={`py-1.5 px-2 rounded-btn text-xs font-medium border flex items-center gap-1.5 transition-all ${
                     theme === 'violet'
                       ? 'bg-purple-950/60 border-purple-500 text-purple-300 font-bold shadow-sm shadow-purple-500/20'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      : 'bg-surface-card border-line-subtle text-ink-secondary hover:text-ink-primary'
                   }`}
                 >
                   <span className="h-2 w-2 rounded-full bg-purple-400" /> Violet Gamer
                 </button>
                 <button
                   onClick={() => setTheme('stealth')}
-                  className={`py-1.5 px-2 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-all ${
+                  className={`py-1.5 px-2 rounded-btn text-xs font-medium border flex items-center gap-1.5 transition-all ${
                     theme === 'stealth'
-                      ? 'bg-slate-800 border-slate-400 text-slate-100 font-bold shadow-sm shadow-slate-500/20'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-surface-raised border-line-divider text-ink-primary font-bold shadow-sm'
+                      : 'bg-surface-card border-line-subtle text-ink-secondary hover:text-ink-primary'
                   }`}
                 >
-                  <span className="h-2 w-2 rounded-full bg-slate-400" /> Stealth
+                  <span className="h-2 w-2 rounded-full bg-ink-secondary" /> Stealth
                 </button>
               </div>
             </div>
 
             {/* Layout Mode */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300">
-                <Maximize2 className="h-3.5 w-3.5 text-indigo-400" />
+            <div className="p-3.5 rounded-card bg-surface-ground border border-line-subtle space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-ink-primary">
+                <Maximize2 className="h-3.5 w-3.5 text-xbox-light" />
                 <span>{t('overlaySettings', 'layoutTitle', 'Modo de Presentación')}</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => setLayout('full')}
-                  className={`py-2 px-2.5 rounded-xl text-xs font-medium border flex items-center justify-center gap-1.5 transition-all ${
+                  className={`py-2 px-2.5 rounded-btn text-xs font-medium border flex items-center justify-center gap-1.5 transition-all ${
                     layout === 'full'
-                      ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300 font-bold shadow-sm shadow-indigo-600/20'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-[#141f17] border-xbox-core text-xbox-light font-bold shadow-sm shadow-xbox-core/20'
+                      : 'bg-surface-card border-line-subtle text-ink-secondary hover:text-ink-primary'
                   }`}
                 >
                   <Maximize2 className="h-3 w-3" />
@@ -570,10 +566,10 @@ export default function OverlaySettingsModal({
                 </button>
                 <button
                   onClick={() => setLayout('compact')}
-                  className={`py-2 px-2.5 rounded-xl text-xs font-medium border flex items-center justify-center gap-1.5 transition-all ${
+                  className={`py-2 px-2.5 rounded-btn text-xs font-medium border flex items-center justify-center gap-1.5 transition-all ${
                     layout === 'compact'
-                      ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300 font-bold shadow-sm shadow-indigo-600/20'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-[#141f17] border-xbox-core text-xbox-light font-bold shadow-sm shadow-xbox-core/20'
+                      : 'bg-surface-card border-line-subtle text-ink-secondary hover:text-ink-primary'
                   }`}
                 >
                   <Minimize2 className="h-3 w-3" />
@@ -586,10 +582,10 @@ export default function OverlaySettingsModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+        <div className="pt-3 border-t border-line-subtle flex items-center justify-between">
           <div>
             {savedSuccess && (
-              <span className="text-xs font-bold text-emerald-400 flex items-center gap-1 animate-fade-in">
+              <span className="text-xs font-bold text-xbox-light flex items-center gap-1 animate-fade-in">
                 <Check className="h-4 w-4" />
                 {t('overlaySettings', 'appliedSuccess', '¡Configuración guardada y aplicada con éxito!')}
               </span>
@@ -598,14 +594,14 @@ export default function OverlaySettingsModal({
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+              className="btn-dark-subtle px-4 py-1.5 text-xs font-semibold"
             >
               {t('common', 'close', 'Cerrar')}
             </button>
             <button
               onClick={handleApply}
               disabled={isSaving}
-              className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+              className="btn-xbox-primary px-5 py-1.5 text-xs font-bold flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span>{isSaving ? 'Guardando...' : t('overlaySettings', 'applyBtn', 'Guardar & Aplicar en Pantalla')}</span>

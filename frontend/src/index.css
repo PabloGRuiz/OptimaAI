@@ -9,59 +9,107 @@
 body {
   margin: 0;
   overflow-x: hidden;
-  background-color: #0B0F19;
+  background-color: #0e0e10;
+  color: #f3f4f6;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: -0.01em;
 }
 
-/* Ultra-smooth GPU accelerated panels (No heavy Gaussian blur thrashing) */
+/* Epic / Steam / Xbox Anodized Aluminum Matte Surface */
 .glass-panel {
-  background: rgba(17, 24, 39, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+  background-color: #18181c;
+  border: 1px solid #26262b;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
   transform: translateZ(0);
 }
 
 .glass-panel-header {
-  background: rgba(11, 15, 25, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(18, 18, 20, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #26262b;
   transform: translateZ(0);
 }
 
 .glass-card {
-  background: rgba(31, 41, 55, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: #141417;
+  border: 1px solid #26262b;
+  border-radius: 8px;
 }
 
-.glow-indigo {
-  box-shadow: 0 0 20px -5px rgba(99, 102, 241, 0.2);
+/* Xbox Action Button Styles */
+.btn-xbox-primary {
+  background-color: #107C41;
+  color: #ffffff;
+  border: 1px solid #13de64;
+  border-color: rgba(19, 222, 100, 0.25);
+  border-radius: 6px;
+  font-weight: 700;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 2px 10px -2px rgba(16, 124, 65, 0.45);
 }
 
-.glow-emerald {
-  box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.2);
+.btn-xbox-primary:hover:not(:disabled) {
+  background-color: #108d4a;
+  border-color: rgba(19, 222, 100, 0.4);
+  box-shadow: 0 0 16px -2px rgba(16, 208, 92, 0.5);
 }
 
-.glow-rose {
-  box-shadow: 0 0 20px -5px rgba(244, 63, 94, 0.2);
+.btn-xbox-primary:active:not(:disabled) {
+  background-color: #0e6d39;
 }
 
-/* Custom scrollbars */
+.btn-dark-subtle {
+  background-color: #1f1f24;
+  color: #d1d5db;
+  border: 1px solid #2d2d34;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-dark-subtle:hover:not(:disabled) {
+  background-color: #26262c;
+  color: #f3f4f6;
+  border-color: #3b3b45;
+}
+
+.badge-mono {
+  background-color: #1f1f24;
+  border: 1px solid #2d2d34;
+  color: #d1d5db;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.glow-xbox {
+  box-shadow: 0 0 14px -2px rgba(16, 208, 92, 0.4);
+}
+
+.glow-crit {
+  box-shadow: 0 0 14px -2px rgba(239, 68, 68, 0.35);
+}
+
+/* Custom Steam/Epic scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0F19;
+  background: #0e0e10;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1F2937;
+  background: #202026;
   border-radius: 4px;
+  border: 1px solid #141417;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #2d2d34;
 }
 
 code, pre {

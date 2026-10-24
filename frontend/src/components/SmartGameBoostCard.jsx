@@ -219,48 +219,44 @@ export default function SmartGameBoostCard({
   const gpuName = gamingTelemetry?.gpu_name || 'GPU';
 
   return (
-    <div className="relative rounded-2xl bg-gradient-to-br from-slate-900/95 via-[#0c1220]/95 to-slate-900/95 border border-indigo-500/30 p-5 shadow-2xl shadow-indigo-500/10 overflow-hidden">
+    <div className="glass-panel p-5 relative overflow-hidden">
       
-      {/* Decorative backdrop glow */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-indigo-500/15 via-purple-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-4 relative z-10">
+      <div className="flex items-center justify-between gap-4 mb-3.5 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-            <Gamepad2 className="h-5 w-5 text-white" />
+          <div className="h-9 w-9 rounded-md bg-[#141417] border border-[#2d2d34] flex items-center justify-center shadow-sm">
+            <Gamepad2 className="h-5 w-5 text-[#10d05c]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-white tracking-tight">{t('smartGameBoost', 'title')}</h2>
+              <h2 className="text-base font-bold text-[#f3f4f6] tracking-tight">{t('smartGameBoost', 'title')}</h2>
               {isPro ? (
-                <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-gradient-to-r from-amber-500/20 to-purple-500/20 text-amber-300 border border-amber-400/30 flex items-center gap-1">
-                  <Crown className="h-3 w-3 text-yellow-400" /> {t('smartGameBoost', 'proSentinel')}
+                <span className="badge-mono px-2 py-0.5 text-[10px] font-bold uppercase flex items-center gap-1 border-[#3b3b45] text-[#d1d5db]">
+                  <Crown className="h-3 w-3 text-[#d1d5db]" /> {t('smartGameBoost', 'proSentinel')}
                 </span>
               ) : (
                 <button
                   onClick={onOpenProModal}
-                  className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 flex items-center gap-1 transition-all"
+                  className="btn-xbox-primary px-2.5 py-0.5 text-[10px] font-bold uppercase flex items-center gap-1"
                 >
-                  <Crown className="h-3 w-3" /> {t('smartGameBoost', 'unlockPro')}
+                  <Crown className="h-3 w-3 text-white" /> {t('smartGameBoost', 'unlockPro')}
                 </button>
               )}
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#9ca3af]">
               {t('smartGameBoost', 'subtitle')}
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={() => setShowConfig(!showConfig)}
-            className="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-colors flex items-center gap-1"
+            className="btn-dark-subtle text-xs px-2.5 py-1.5 flex items-center gap-1.5"
           >
             <span>{showConfig ? '▲' : '⚙️'} {t('smartGameBoost', 'customGamesTitle').split(' ')[0]}</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-slate-700 text-[10px] text-slate-300">
+            <span className="px-1.5 py-0.2 rounded bg-[#151518] border border-[#2d2d34] text-[10px] text-[#9ca3af]">
               {customGames.length}
             </span>
           </button>
@@ -268,14 +264,14 @@ export default function SmartGameBoostCard({
           {/* Toggle Switch */}
           <button
             onClick={() => onToggleDetector(!isEnabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-              isEnabled ? 'bg-indigo-600' : 'bg-slate-700'
+            className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors focus:outline-none ${
+              isEnabled ? 'bg-[#107C41]' : 'bg-[#26262b]'
             }`}
             title={isEnabled ? 'Pausar' : 'Activar'}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                isEnabled ? 'translate-x-6' : 'translate-x-1'
+              className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                isEnabled ? 'translate-x-5' : 'translate-x-1'
               }`}
             />
           </button>
@@ -285,24 +281,24 @@ export default function SmartGameBoostCard({
       {/* Main Status Display Area */}
       {activeGame ? (
         /* GAME RUNNING STATE */
-        <div className="relative z-10 p-4 rounded-xl bg-gradient-to-r from-emerald-500/15 via-indigo-500/10 to-emerald-500/15 border border-emerald-500/40 shadow-inner mb-4">
+        <div className="relative z-10 p-3.5 rounded-lg bg-[#141d17] border border-[#107C41]/50 shadow-sm mb-3">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <span className="relative flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10d05c] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#10d05c]"></span>
               </span>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">{t('smartGameBoost', 'activeGameTitle')}</span>
-                  <span className="text-sm font-extrabold text-white">{activeGame.name}</span>
-                  <span className="px-2 py-0.5 text-[10px] rounded bg-slate-800/80 text-cyan-300 border border-cyan-500/30">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#10d05c]">{t('smartGameBoost', 'activeGameTitle')}</span>
+                  <span className="text-sm font-bold text-[#f3f4f6]">{activeGame.name}</span>
+                  <span className="badge-mono px-2 py-0.5 text-[10px] font-mono">
                     {activeGame.platform}
                   </span>
-                  <span className="text-xs text-slate-400 font-mono">(PID: {activeGame.pid})</span>
+                  <span className="text-xs text-[#9ca3af] font-mono">(PID: {activeGame.pid})</span>
                 </div>
-                <p className="text-xs text-emerald-300/90 mt-0.5 flex items-center gap-1.5">
-                  <Zap className="h-3.5 w-3.5 text-yellow-400" />
+                <p className="text-xs text-[#9ca3af] mt-0.5 flex items-center gap-1.5">
+                  <Zap className="h-3.5 w-3.5 text-[#10d05c]" />
                   {isPro
                     ? t('smartGameBoost', 'highPriorityActive')
                     : t('smartGameBoost', 'freePassiveAlert')}
@@ -314,12 +310,12 @@ export default function SmartGameBoostCard({
               <button
                 onClick={() => onIgnoreProcess && onIgnoreProcess(activeGame.name)}
                 title="Ignorar proceso si no es un juego"
-                className="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 transition-all shadow-sm"
+                className="btn-dark-subtle px-2.5 py-1 text-xs text-[#ef4444] border-[#ef4444]/30 hover:border-[#ef4444] flex items-center gap-1"
               >
                 <EyeOff className="h-3.5 w-3.5" />
                 <span>{t('smartGameBoost', 'notAGameBtn')}</span>
               </button>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+              <span className="badge-mono px-2.5 py-1 text-xs text-[#10d05c] border-[#107C41]/40 flex items-center gap-1">
                 <Activity className="h-3.5 w-3.5" />
                 <span>{t('smartGameBoost', 'gameModeActive')}</span>
               </span>
@@ -328,93 +324,93 @@ export default function SmartGameBoostCard({
         </div>
       ) : (
         /* STANDBY SCANNING STATE */
-        <div className="relative z-10 p-3 rounded-xl bg-slate-800/40 border border-slate-700/50 flex items-center justify-between flex-wrap gap-2 text-xs mb-4">
-          <div className="flex items-center gap-2.5">
-            <span className="relative flex h-2.5 w-2.5">
+        <div className="relative z-10 p-2.5 rounded-lg bg-[#141417] border border-[#26262b] flex items-center justify-between flex-wrap gap-2 text-xs mb-3">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
               {isEnabled && (
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10d05c] opacity-75"></span>
               )}
-              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${isEnabled ? 'bg-cyan-500' : 'bg-slate-500'}`}></span>
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isEnabled ? 'bg-[#10d05c]' : 'bg-[#6b7280]'}`}></span>
             </span>
-            <span className="text-slate-300">
+            <span className="text-[#9ca3af]">
               {isEnabled
                 ? t('smartGameBoost', 'standbySentinel')
                 : t('smartGameBoost', 'pausedSentinel')}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-            <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300">Steam</span>
-            <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300">Epic</span>
-            <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300">Riot</span>
-            <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300">Battle.net</span>
-            <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300">Xbox</span>
+          <div className="flex items-center gap-1.5 text-[10px]">
+            <span className="badge-mono px-2 py-0.5 text-[#9ca3af]">Steam</span>
+            <span className="badge-mono px-2 py-0.5 text-[#9ca3af]">Epic</span>
+            <span className="badge-mono px-2 py-0.5 text-[#9ca3af]">Riot</span>
+            <span className="badge-mono px-2 py-0.5 text-[#9ca3af]">Battle.net</span>
+            <span className="badge-mono px-2 py-0.5 text-[#9ca3af]">Xbox</span>
           </div>
         </div>
       )}
 
       {/* LIVE GAMING HARDWARE TELEMETRY PANEL */}
-      <div className="relative z-10 mb-4 bg-slate-950/70 border border-slate-800 rounded-xl p-3.5">
-        <div className="flex items-center justify-between mb-2.5">
+      <div className="relative z-10 mb-3 bg-[#141417] border border-[#26262b] rounded-lg p-3">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-cyan-400" />
-            <span className="text-xs font-bold text-slate-200">{t('smartGameBoost', 'liveTelemetry')}</span>
-            <span className="text-[10px] text-slate-400">({gpuName})</span>
+            <Activity className="h-3.5 w-3.5 text-[#10d05c]" />
+            <span className="text-xs font-bold text-[#f3f4f6]">{t('smartGameBoost', 'liveTelemetry')}</span>
+            <span className="text-[10px] text-[#9ca3af]">({gpuName})</span>
           </div>
-          <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Direct3D / PDH
+          <span className="text-[11px] font-mono text-[#10d05c] flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#10d05c] animate-pulse" /> Direct3D / PDH
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {/* Tile 1: Authentic FPS */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-slate-400 text-[11px]">
+          <div className="bg-[#18181c] border border-[#26262b] rounded-md p-2.5 flex flex-col justify-between hover:border-[#33333d] transition-colors">
+            <div className="flex items-center justify-between text-[#9ca3af] text-[11px]">
               <span className="font-semibold flex items-center gap-1">
-                <Gauge className="h-3 w-3 text-emerald-400" /> {t('smartGameBoost', 'fps')}
+                <Gauge className="h-3 w-3 text-[#10d05c]" /> {t('smartGameBoost', 'fps')}
               </span>
-              <span className="text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">DXGI/ETW</span>
+              <span className="text-[9px] uppercase tracking-wider text-[#10d05c] font-bold">DXGI</span>
             </div>
             <div className="mt-1 flex items-baseline gap-1">
-              <span className="text-xl font-extrabold text-emerald-400 font-mono">
+              <span className="text-xl font-extrabold text-[#10d05c] font-mono">
                 {activeGame ? fpsCount : 60}
               </span>
-              <span className="text-[10px] text-slate-400 font-mono">fps</span>
+              <span className="text-[10px] text-[#9ca3af] font-mono">fps</span>
             </div>
           </div>
 
-          {/* Tile 2: 1% Low FPS (Real Stability Metric) */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-slate-400 text-[11px]">
+          {/* Tile 2: 1% Low FPS */}
+          <div className="bg-[#18181c] border border-[#26262b] rounded-md p-2.5 flex flex-col justify-between hover:border-[#33333d] transition-colors">
+            <div className="flex items-center justify-between text-[#9ca3af] text-[11px]">
               <span className="font-semibold flex items-center gap-1">
-                <Activity className="h-3 w-3 text-cyan-400" /> {t('benchmark', 'onePercentLow', '1% Low FPS')}
+                <Activity className="h-3 w-3 text-[#9ca3af]" /> {t('benchmark', 'onePercentLow', '1% Low FPS')}
               </span>
-              <span className="text-[9px] uppercase tracking-wider text-cyan-400/80 font-bold">P99 Cadence</span>
+              <span className="text-[9px] uppercase tracking-wider text-[#9ca3af] font-bold">P99</span>
             </div>
             <div className="mt-1 flex items-baseline gap-1">
-              <span className="text-xl font-extrabold text-cyan-300 font-mono">
+              <span className="text-xl font-extrabold text-[#f3f4f6] font-mono">
                 {activeGame ? (gamingTelemetry?.one_percent_low || 60) : 60}
               </span>
-              <span className="text-[10px] text-slate-400 font-mono">fps</span>
+              <span className="text-[10px] text-[#9ca3af] font-mono">fps</span>
             </div>
           </div>
 
           {/* Tile 3: GPU 3D Load & VRAM */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-slate-400 text-[11px]">
+          <div className="bg-[#18181c] border border-[#26262b] rounded-md p-2.5 flex flex-col justify-between hover:border-[#33333d] transition-colors">
+            <div className="flex items-center justify-between text-[#9ca3af] text-[11px]">
               <span className="font-semibold flex items-center gap-1">
-                <Flame className="h-3 w-3 text-amber-400" /> {t('smartGameBoost', 'gpuLoad')}
+                <Flame className="h-3 w-3 text-[#10d05c]" /> {t('smartGameBoost', 'gpuLoad')}
               </span>
-              <span className="text-[9px] font-mono text-purple-300 font-bold">{vramUsedGb}G / {vramTotalGb}G</span>
+              <span className="text-[9px] font-mono text-[#d1d5db] font-bold">{vramUsedGb}G / {vramTotalGb}G</span>
             </div>
-            <div className="mt-1.5">
-              <div className="flex items-center justify-between text-[11px] font-mono text-slate-300 mb-1">
+            <div className="mt-1">
+              <div className="flex items-center justify-between text-[10px] font-mono text-[#9ca3af] mb-1">
                 <span>GPU {gpuLoad}%</span>
                 <span>VRAM {vramPercent}%</span>
               </div>
-              <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+              <div className="w-full bg-[#121214] border border-[#26262b] h-1.5 rounded-full overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-500 h-full rounded-full transition-all duration-500"
+                  className="bg-[#107C41] h-full rounded-full transition-all duration-500"
                   style={{ width: `${gpuLoad}%` }}
                 />
               </div>
@@ -422,14 +418,14 @@ export default function SmartGameBoostCard({
           </div>
 
           {/* Tile 4: Benchmark Controller CTA */}
-          <div className="bg-slate-900/90 border border-indigo-500/30 rounded-lg p-2.5 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-slate-400 text-[11px]">
-              <span className="font-semibold text-white flex items-center gap-1">
-                <Zap className="h-3 w-3 text-yellow-400" /> Benchmark Pro
+          <div className="bg-[#18181c] border border-[#26262b] rounded-md p-2.5 flex flex-col justify-between hover:border-[#33333d] transition-colors">
+            <div className="flex items-center justify-between text-[#9ca3af] text-[11px]">
+              <span className="font-semibold text-[#f3f4f6] flex items-center gap-1">
+                <Zap className="h-3 w-3 text-[#10d05c]" /> Benchmark Pro
               </span>
               <button
                 onClick={handleFetchHistory}
-                className="text-[10px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5"
+                className="text-[10px] text-[#9ca3af] hover:text-[#f3f4f6] flex items-center gap-0.5 cursor-pointer"
               >
                 <History className="h-2.5 w-2.5" /> {t('smartGameBoost', 'benchHistoryBtn', 'Historial')}
               </button>
@@ -437,13 +433,13 @@ export default function SmartGameBoostCard({
 
             <button
               onClick={handleToggleBenchmark}
-              className={`mt-1.5 w-full py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md ${
+              className={`mt-1.5 w-full py-1.5 px-2.5 rounded-md text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 isBenchmarking
-                  ? 'bg-gradient-to-r from-rose-600 via-red-500 to-amber-600 text-white animate-pulse shadow-rose-600/30'
-                  : 'bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white shadow-indigo-600/20'
+                  ? 'bg-[#ef4444] hover:bg-red-600 text-white animate-pulse shadow-md shadow-red-900/30'
+                  : 'btn-xbox-primary'
               }`}
             >
-              <span className={`h-2 w-2 rounded-full ${isBenchmarking ? 'bg-white' : 'bg-red-400'}`} />
+              <span className={`h-2 w-2 rounded-full ${isBenchmarking ? 'bg-white' : 'bg-[#10d05c]'}`} />
               <span>
                 {isBenchmarking
                   ? `${t('smartGameBoost', 'stopBenchBtn', 'Detener')} (${Math.floor((gamingTelemetry?.benchmark_elapsed_sec || 0) / 60)}:${Math.floor((gamingTelemetry?.benchmark_elapsed_sec || 0) % 60).toString().padStart(2, '0')})`
@@ -455,38 +451,38 @@ export default function SmartGameBoostCard({
       </div>
 
       {/* PRO EXCLUSIVE: IN-GAME OVERLAY 2.0 CONTROL BAR */}
-      <div className="relative z-10 p-3.5 rounded-xl bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-purple-950/40 border border-purple-500/30 flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-purple-600/30 border border-purple-500/40 flex items-center justify-center text-purple-300 shadow-md">
-            <Monitor className="h-4.5 w-4.5" />
+      <div className="relative z-10 p-3 rounded-lg bg-[#141417] border border-[#26262b] flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-md bg-[#18181c] border border-[#2d2d34] flex items-center justify-center text-[#10d05c] shadow-sm">
+            <Monitor className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-white">{t('smartGameBoost', 'hudFloatingTitle')}</span>
+              <span className="text-xs font-bold text-[#f3f4f6]">{t('smartGameBoost', 'hudFloatingTitle')}</span>
               {isPro ? (
-                <span className="px-1.5 py-0.2 text-[9px] font-bold uppercase rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                <span className="badge-mono px-1.5 py-0.2 text-[9px] font-bold uppercase text-[#10d05c] border-[#107C41]/40">
                   {t('smartGameBoost', 'proSentinel')}
                 </span>
               ) : (
-                <span className="px-1.5 py-0.2 text-[9px] font-bold uppercase rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-0.5">
-                  <Crown className="h-2.5 w-2.5" /> PRO
+                <span className="badge-mono px-1.5 py-0.2 text-[9px] font-bold uppercase flex items-center gap-0.5">
+                  <Crown className="h-2.5 w-2.5 text-[#d1d5db]" /> PRO
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-[#9ca3af]">
               {t('smartGameBoost', 'hudFloatingSubtitle')}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center flex-wrap gap-2.5">
+        <div className="flex items-center flex-wrap gap-2">
           {/* 4-Position Selector */}
-          <div className="flex items-center bg-slate-900/80 border border-slate-700/60 rounded-lg p-0.5 text-[10px]">
+          <div className="flex items-center bg-[#18181c] border border-[#26262b] rounded-md p-0.5 text-[10px]">
             <button
               onClick={() => handleUpdateOverlayConfig('top-left')}
               title="Superior Izquierda"
               className={`px-1.5 py-1 rounded ${
-                overlayPosition === 'top-left' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                overlayPosition === 'top-left' ? 'bg-[#107C41] text-white font-bold' : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
             >
               ↖ {t('smartGameBoost', 'topLeft')}
@@ -495,7 +491,7 @@ export default function SmartGameBoostCard({
               onClick={() => handleUpdateOverlayConfig('top-right')}
               title="Superior Derecha"
               className={`px-1.5 py-1 rounded ${
-                overlayPosition === 'top-right' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                overlayPosition === 'top-right' ? 'bg-[#107C41] text-white font-bold' : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
             >
               ↗ {t('smartGameBoost', 'topRight')}
@@ -504,7 +500,7 @@ export default function SmartGameBoostCard({
               onClick={() => handleUpdateOverlayConfig('bottom-left')}
               title="Inferior Izquierda"
               className={`px-1.5 py-1 rounded ${
-                overlayPosition === 'bottom-left' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                overlayPosition === 'bottom-left' ? 'bg-[#107C41] text-white font-bold' : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
             >
               ↙ {t('smartGameBoost', 'bottomLeft', 'Inf-Izq')}
@@ -513,7 +509,7 @@ export default function SmartGameBoostCard({
               onClick={() => handleUpdateOverlayConfig('bottom-right')}
               title="Inferior Derecha"
               className={`px-1.5 py-1 rounded ${
-                overlayPosition === 'bottom-right' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                overlayPosition === 'bottom-right' ? 'bg-[#107C41] text-white font-bold' : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
             >
               ↘ {t('smartGameBoost', 'bottomRight', 'Inf-Der')}
@@ -521,20 +517,20 @@ export default function SmartGameBoostCard({
           </div>
 
           {/* Theme Selector */}
-          <div className="flex items-center bg-slate-900/80 border border-slate-700/60 rounded-lg p-0.5 text-[10px]">
+          <div className="flex items-center bg-[#18181c] border border-[#26262b] rounded-md p-0.5 text-[10px]">
             <button
               onClick={() => handleUpdateOverlayConfig(null, 'cyberpunk')}
               className={`px-2 py-1 rounded flex items-center gap-1 ${
-                overlayTheme === 'cyberpunk' ? 'bg-emerald-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                overlayTheme === 'cyberpunk' ? 'bg-[#202026] text-[#10d05c] font-bold border border-[#2d2d34]' : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#10d05c]" />
               <span>Cyber</span>
             </button>
             <button
               onClick={() => handleUpdateOverlayConfig(null, 'cyan')}
               className={`px-2 py-1 rounded flex items-center gap-1 ${
-                overlayTheme === 'cyan' ? 'bg-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                overlayTheme === 'cyan' ? 'bg-[#202026] text-cyan-400 font-bold border border-[#2d2d34]' : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
@@ -543,7 +539,7 @@ export default function SmartGameBoostCard({
             <button
               onClick={() => handleUpdateOverlayConfig(null, 'violet')}
               className={`px-2 py-1 rounded flex items-center gap-1 ${
-                overlayTheme === 'violet' ? 'bg-purple-600 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                overlayTheme === 'violet' ? 'bg-[#202026] text-purple-400 font-bold border border-[#2d2d34]' : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-purple-400" />
@@ -552,11 +548,11 @@ export default function SmartGameBoostCard({
           </div>
 
           {/* Compact / Full Layout Mode */}
-          <div className="flex items-center bg-slate-900/80 border border-slate-700/60 rounded-lg p-0.5 text-[10px]">
+          <div className="flex items-center bg-[#18181c] border border-[#26262b] rounded-md p-0.5 text-[10px]">
             <button
               onClick={() => handleUpdateOverlayConfig(null, null, 'full')}
               className={`px-2 py-1 rounded flex items-center gap-1 ${
-                overlayLayout === 'full' ? 'bg-slate-700 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                overlayLayout === 'full' ? 'bg-[#202026] text-[#f3f4f6] font-bold border border-[#2d2d34]' : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
             >
               <Maximize2 className="h-2.5 w-2.5" />
@@ -565,7 +561,7 @@ export default function SmartGameBoostCard({
             <button
               onClick={() => handleUpdateOverlayConfig(null, null, 'compact')}
               className={`px-2 py-1 rounded flex items-center gap-1 ${
-                overlayLayout === 'compact' ? 'bg-slate-700 text-white font-bold' : 'text-slate-400 hover:text-slate-200'
+                overlayLayout === 'compact' ? 'bg-[#202026] text-[#f3f4f6] font-bold border border-[#2d2d34]' : 'text-[#9ca3af] hover:text-[#f3f4f6]'
               }`}
             >
               <Minimize2 className="h-2.5 w-2.5" />
@@ -577,10 +573,10 @@ export default function SmartGameBoostCard({
           {isPro && (
             <button
               onClick={() => setIsOverlaySettingsOpen(true)}
-              className="px-2.5 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+              className="btn-dark-subtle px-2.5 py-1.5 text-xs flex items-center gap-1.5"
               title="Personalizar posición en pantalla interactiva y atajos de teclado"
             >
-              <Sliders className="h-3.5 w-3.5 text-indigo-400" />
+              <Sliders className="h-3.5 w-3.5 text-[#10d05c]" />
               <span>Personalizar (F10/F11)</span>
             </button>
           )}
@@ -590,10 +586,10 @@ export default function SmartGameBoostCard({
             <button
               onClick={() => handleToggleOverlay(!overlayActive)}
               disabled={overlayLoading}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 overlayActive
-                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/30'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+                  ? 'btn-xbox-primary shadow-sm'
+                  : 'btn-dark-subtle text-[#9ca3af]'
               }`}
             >
               <Eye className="h-3.5 w-3.5" />
@@ -602,9 +598,9 @@ export default function SmartGameBoostCard({
           ) : (
             <button
               onClick={onOpenProModal}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition-all"
+              className="btn-xbox-primary px-3 py-1.5 text-xs font-bold flex items-center gap-1.5"
             >
-              <Crown className="h-3.5 w-3.5" />
+              <Crown className="h-3.5 w-3.5 text-white" />
               <span>{t('smartGameBoost', 'unlockHudWithPro')}</span>
             </button>
           )}

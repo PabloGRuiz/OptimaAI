@@ -20,41 +20,41 @@ export default function OllamaStatusBanner({
     <>
       {/* Banner Display */}
       {!isConnected ? (
-        <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/30 via-slate-900 to-indigo-950/20 p-4 shadow-lg transition-all">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="rounded-card border border-line-subtle bg-surface-card p-3.5 shadow-sm transition-all">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             
             <div className="flex items-start gap-3">
-              <div className="h-9 w-9 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Zap className="h-5 w-5" />
+              <div className="h-8 w-8 rounded-md bg-surface-raised border border-line-subtle text-ink-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Zap className="h-4 w-4 text-xbox-light" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm text-white">{t('ollamaBanner', 'titleStopped')}</span>
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 uppercase">
+                  <span className="font-bold text-xs text-ink-primary">{t('ollamaBanner', 'titleStopped')}</span>
+                  <span className="badge-mono text-[10px]">
                     Heuristic
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                <p className="text-xs text-ink-secondary mt-0.5 leading-relaxed">
                   {t('ollamaBanner', 'infoText')}
                 </p>
-                <div className="flex items-center gap-2 mt-2 text-[11px] text-cyan-300">
-                  <Info className="h-3.5 w-3.5 flex-shrink-0 text-cyan-400" />
+                <div className="flex items-center gap-1.5 mt-1 text-[11px] text-ink-secondary">
+                  <Info className="h-3 w-3 flex-shrink-0 text-xbox-light" />
                   <span>
-                    <strong>Ollama idle:</strong> {t('ollamaBanner', 'zeroConsumption')}
+                    <strong className="text-ink-primary">Ollama idle:</strong> {t('ollamaBanner', 'zeroConsumption')}
                   </span>
                 </div>
               </div>
             </div>
 
             {/* Action CTA */}
-            <div className="flex items-center gap-2.5 flex-shrink-0 w-full sm:w-auto">
+            <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
               {isInstalled ? (
                 <button
                   onClick={() => setShowConfirmLaunch(true)}
                   disabled={launching}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition disabled:opacity-50"
+                  className="btn-xbox-primary w-full sm:w-auto flex items-center justify-center gap-1.5 px-3.5 py-1.5 text-xs font-bold disabled:opacity-50"
                 >
-                  <Play className={`h-3.5 w-3.5 fill-current ${launching ? 'animate-spin' : ''}`} />
+                  <Play className={`h-3 w-3 fill-current ${launching ? 'animate-spin' : ''}`} />
                   <span>{launching ? t('ollamaBanner', 'starting') : t('ollamaBanner', 'startBtn')}</span>
                 </button>
               ) : (
@@ -62,9 +62,9 @@ export default function OllamaStatusBanner({
                   href={ollamaStatus.download_url || "https://ollama.com/download"}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white shadow-md transition"
+                  className="btn-dark-subtle w-full sm:w-auto flex items-center justify-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
                 >
-                  <Download className="h-3.5 w-3.5" />
+                  <Download className="h-3 w-3" />
                   <span>Ollama.com</span>
                 </a>
               )}
@@ -74,14 +74,14 @@ export default function OllamaStatusBanner({
         </div>
       ) : (
         /* Connected Information Pill */
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/15 px-4 py-2 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2 text-emerald-300">
-            <Sparkles className="h-4 w-4 text-emerald-400" />
-            <span>{t('ollamaBanner', 'titleRunning')}: <strong>{ollamaStatus.active_model}</strong></span>
+        <div className="rounded-card border border-[#107C41]/30 bg-[#121f17] px-3.5 py-2 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 text-xbox-light font-medium">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>{t('ollamaBanner', 'titleRunning')}: <strong className="text-white font-mono">{ollamaStatus.active_model}</strong></span>
           </div>
           <button
             onClick={() => setShowDetails(true)}
-            className="text-slate-400 hover:text-white flex items-center gap-1 transition"
+            className="text-ink-secondary hover:text-ink-primary flex items-center gap-1 transition text-xs"
           >
             <span>{t('ollamaBanner', 'zeroConsumption')}</span>
             <ChevronRight className="h-3.5 w-3.5" />
@@ -91,23 +91,23 @@ export default function OllamaStatusBanner({
 
       {/* Confirmation Modal to Launch Ollama */}
       {showConfirmLaunch && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-base font-bold text-white flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-indigo-400" /> {t('ollamaBanner', 'startBtn')}
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel bg-surface-card border border-line-divider rounded-card max-w-md w-full p-5 shadow-2xl">
+            <div className="flex items-center justify-between mb-2.5">
+              <h4 className="text-sm font-bold text-ink-primary flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-xbox-light" /> {t('ollamaBanner', 'startBtn')}
               </h4>
-              <button onClick={() => setShowConfirmLaunch(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setShowConfirmLaunch(false)} className="text-ink-secondary hover:text-ink-primary">
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed mb-4">
+            <p className="text-xs text-ink-secondary leading-relaxed mb-4">
               {t('ollamaBanner', 'zeroConsumption')}
             </p>
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex items-center justify-end gap-2">
               <button
                 onClick={() => setShowConfirmLaunch(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white"
+                className="btn-dark-subtle px-3 py-1.5 text-xs font-medium"
               >
                 {t('common', 'cancel')}
               </button>
@@ -116,7 +116,7 @@ export default function OllamaStatusBanner({
                   setShowConfirmLaunch(false);
                   onLaunchOllama();
                 }}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30"
+                className="btn-xbox-primary px-3.5 py-1.5 text-xs font-bold"
               >
                 {t('common', 'ok')}
               </button>
@@ -127,22 +127,22 @@ export default function OllamaStatusBanner({
 
       {/* Consumption Details Dialog */}
       {showDetails && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-base font-bold text-white flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400" /> {t('ollamaBanner', 'titleRunning')}
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel bg-surface-card border border-line-divider rounded-card max-w-md w-full p-5 shadow-2xl">
+            <div className="flex items-center justify-between mb-2.5">
+              <h4 className="text-sm font-bold text-ink-primary flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-xbox-light" /> {t('ollamaBanner', 'titleRunning')}
               </h4>
-              <button onClick={() => setShowDetails(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setShowDetails(false)} className="text-ink-secondary hover:text-ink-primary">
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed mb-4">
+            <p className="text-xs text-ink-secondary leading-relaxed mb-4">
               {t('ollamaBanner', 'zeroConsumption')}
             </p>
             <button
               onClick={() => setShowDetails(false)}
-              className="w-full py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white"
+              className="btn-dark-subtle w-full py-2 text-xs font-bold"
             >
               {t('common', 'close')}
             </button>

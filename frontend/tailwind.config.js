@@ -8,19 +8,55 @@ export default {
   theme: {
     extend: {
       colors: {
-        dark: {
-          900: '#0B0F19',
-          800: '#111827',
-          700: '#1F2937',
-          600: '#374151'
+        // Epic Games Carbon Surfaces
+        surface: {
+          bg: '#0e0e10',
+          panel: '#121214',
+          card: '#18181c',
+          hover: '#202026',
+          subtle: '#1f1f24',
+          input: '#151518',
         },
-        brand: {
-          500: '#6366F1',
-          600: '#4F46E5',
-          cyan: '#06B6D4',
-          emerald: '#10B981',
-          rose: '#F43F5E'
+        // Steam Modern UI Lines & Dividers
+        line: {
+          subtle: '#26262b',
+          divider: '#2d2d34',
+          strong: '#3b3b45',
+        },
+        // Steam Modern UI Neutral Typography
+        ink: {
+          primary: '#f3f4f6',
+          secondary: '#9ca3af',
+          muted: '#6b7280',
+          badge: '#d1d5db',
+        },
+        // Xbox Core Green & Razer Gaming Accents
+        xbox: {
+          dark: '#0c5c30',
+          base: '#107C41',
+          hover: '#108d4a',
+          active: '#0e6d39',
+          bright: '#13de64',
+          glow: '#10d05c',
+        },
+        // Telemetry & Alerts
+        metric: {
+          good: '#10d05c',
+          warn: '#f59e0b',
+          crit: '#ef4444',
+          silver: '#d1d5db',
         }
+      },
+      borderRadius: {
+        card: '8px',
+        btn: '6px',
+        badge: '6px',
+      },
+      boxShadow: {
+        'xbox-glow': '0 0 16px -2px rgba(16, 208, 92, 0.35)',
+        'xbox-glow-sm': '0 0 8px 0px rgba(16, 208, 92, 0.25)',
+        'card-subtle': '0 4px 20px -2px rgba(0, 0, 0, 0.6)',
+        'elevated': '0 8px 24px -4px rgba(0, 0, 0, 0.75)',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

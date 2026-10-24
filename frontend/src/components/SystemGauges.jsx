@@ -6,10 +6,15 @@ export default function SystemGauges({ status }) {
   const { t } = useLanguage();
   if (!status) return null;
 
-  const getUsageColor = (pct) => {
-    if (pct >= 85) return 'from-rose-500 to-red-600 text-rose-400';
-    if (pct >= 65) return 'from-amber-500 to-orange-500 text-amber-400';
-    return 'from-emerald-500 to-teal-500 text-emerald-400';
+  const getBarColor = (pct) => {
+    if (pct >= 88) return 'bg-[#ef4444] shadow-[0_0_8px_#ef4444]';
+    if (pct >= 70) return 'bg-[#f59e0b]';
+    return 'bg-[#107C41]';
+  };
+
+  const getTextColor = (pct) => {
+    if (pct >= 88) return 'text-[#ef4444]';
+    return 'text-[#f3f4f6]';
   };
 
   const cpuPct = status.cpu_total_percent || 0;
@@ -17,89 +22,97 @@ export default function SystemGauges({ status }) {
   const diskPct = status.disk_usage_percent || 0;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
       
       {/* CPU Usage Card */}
-      <div className="glass-panel rounded-2xl p-5 relative overflow-hidden group hover:border-indigo-500/30 transition-all">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
-            <Cpu className="h-4 w-4 text-indigo-400" />
+      <div className="glass-panel p-4 hover:bg-[#202026] hover:border-[#33333b] transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2 text-[#9ca3af] text-xs font-semibold">
+            <Cpu className="h-4 w-4 text-[#10d05c]" />
             <span>{t('gauges', 'cpu')}</span>
           </div>
-          <span className="text-xs text-slate-400">{status.cpu_count_logical} {t('gauges', 'cores')}</span>
+          <span className="text-[11px] font-mono text-[#9ca3af]">{status.cpu_count_logical} {t('gauges', 'cores')}</span>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-extrabold text-white tracking-tight">{cpuPct}%</span>
+          <span className={`text-2xl font-extrabold tracking-tight font-mono ${getTextColor(cpuPct)}`}>
+            {cpuPct}%
+          </span>
         </div>
-        <div className="w-full bg-slate-800/80 rounded-full h-2 mt-3 overflow-hidden">
+        <div className="w-full bg-[#121214] border border-[#26262b] rounded-full h-1.5 mt-2.5 overflow-hidden">
           <div
-            className={`h-full rounded-full bg-gradient-to-r ${getUsageColor(cpuPct)} transition-all duration-500`}
+            className={`h-full rounded-full ${getBarColor(cpuPct)} transition-all duration-500`}
             style={{ width: `${Math.min(cpuPct, 100)}%` }}
           />
         </div>
       </div>
 
       {/* RAM Usage Card */}
-      <div className="glass-panel rounded-2xl p-5 relative overflow-hidden group hover:border-indigo-500/30 transition-all">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
-            <Server className="h-4 w-4 text-cyan-400" />
+      <div className="glass-panel p-4 hover:bg-[#202026] hover:border-[#33333b] transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2 text-[#9ca3af] text-xs font-semibold">
+            <Server className="h-4 w-4 text-[#10d05c]" />
             <span>{t('gauges', 'ram')}</span>
           </div>
-          <span className="text-xs text-slate-400">
+          <span className="text-[11px] font-mono text-[#9ca3af]">
             {status.memory_used_gb} / {status.memory_total_gb} GB
           </span>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-extrabold text-white tracking-tight">{ramPct}%</span>
-          <span className="text-xs text-slate-400">({status.memory_free_gb} GB {t('gauges', 'availableRam').toLowerCase()})</span>
+          <span className={`text-2xl font-extrabold tracking-tight font-mono ${getTextColor(ramPct)}`}>
+            {ramPct}%
+          </span>
+          <span className="text-[11px] text-[#9ca3af] font-mono">
+            ({status.memory_free_gb} GB {t('gauges', 'availableRam').toLowerCase()})
+          </span>
         </div>
-        <div className="w-full bg-slate-800/80 rounded-full h-2 mt-3 overflow-hidden">
+        <div className="w-full bg-[#121214] border border-[#26262b] rounded-full h-1.5 mt-2.5 overflow-hidden">
           <div
-            className={`h-full rounded-full bg-gradient-to-r ${getUsageColor(ramPct)} transition-all duration-500`}
+            className={`h-full rounded-full ${getBarColor(ramPct)} transition-all duration-500`}
             style={{ width: `${Math.min(ramPct, 100)}%` }}
           />
         </div>
       </div>
 
       {/* Disk Usage Card */}
-      <div className="glass-panel rounded-2xl p-5 relative overflow-hidden group hover:border-indigo-500/30 transition-all">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
-            <HardDrive className="h-4 w-4 text-emerald-400" />
+      <div className="glass-panel p-4 hover:bg-[#202026] hover:border-[#33333b] transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2 text-[#9ca3af] text-xs font-semibold">
+            <HardDrive className="h-4 w-4 text-[#10d05c]" />
             <span>{t('gauges', 'disk')}</span>
           </div>
-          <span className="text-xs text-slate-400">Drive C:\</span>
+          <span className="text-[11px] font-mono text-[#9ca3af]">Drive C:\</span>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-extrabold text-white tracking-tight">{diskPct}%</span>
+          <span className={`text-2xl font-extrabold tracking-tight font-mono ${getTextColor(diskPct)}`}>
+            {diskPct}%
+          </span>
         </div>
-        <div className="w-full bg-slate-800/80 rounded-full h-2 mt-3 overflow-hidden">
+        <div className="w-full bg-[#121214] border border-[#26262b] rounded-full h-1.5 mt-2.5 overflow-hidden">
           <div
-            className={`h-full rounded-full bg-gradient-to-r ${getUsageColor(diskPct)} transition-all duration-500`}
+            className={`h-full rounded-full ${getBarColor(diskPct)} transition-all duration-500`}
             style={{ width: `${Math.min(diskPct, 100)}%` }}
           />
         </div>
       </div>
 
       {/* Total Processes Card */}
-      <div className="glass-panel rounded-2xl p-5 relative overflow-hidden group hover:border-indigo-500/30 transition-all">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
-            <Activity className="h-4 w-4 text-amber-400" />
+      <div className="glass-panel p-4 hover:bg-[#202026] hover:border-[#33333b] transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2 text-[#9ca3af] text-xs font-semibold">
+            <Activity className="h-4 w-4 text-[#10d05c]" />
             <span>{t('gauges', 'processes')}</span>
           </div>
-          <span className="text-xs text-emerald-400 font-semibold">{t('gauges', 'availableRam')}</span>
+          <span className="text-[11px] text-[#10d05c] font-semibold">{t('gauges', 'availableRam')}</span>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-extrabold text-white tracking-tight">
+          <span className="text-2xl font-extrabold tracking-tight font-mono text-[#f3f4f6]">
             {status.total_processes || '--'}
           </span>
-          <span className="text-xs text-slate-400">PID</span>
+          <span className="text-[11px] text-[#9ca3af]">activos</span>
         </div>
-        <div className="w-full bg-slate-800/80 rounded-full h-2 mt-3 overflow-hidden">
+        <div className="w-full bg-[#121214] border border-[#26262b] rounded-full h-1.5 mt-2.5 overflow-hidden">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400"
+            className="h-full rounded-full bg-[#107C41]"
             style={{ width: '100%' }}
           />
         </div>

@@ -64,82 +64,77 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
     }
   };
 
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg bg-slate-900/95 border border-amber-500/30 rounded-2xl p-6 shadow-2xl shadow-amber-500/10 overflow-hidden text-slate-100">
-        
-        {/* Background glow effects */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-amber-500/20 to-purple-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-gradient-to-tr from-indigo-500/20 to-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-lg bg-surface-card border border-line-divider rounded-card p-6 shadow-2xl overflow-hidden text-ink-primary">
 
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-btn text-ink-secondary hover:text-ink-primary hover:bg-surface-raised transition-colors"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 flex items-center justify-center shadow-lg shadow-amber-500/30">
-            <Crown className="h-6 w-6 text-slate-950 font-bold" />
+          <div className="h-10 w-10 rounded-md bg-surface-raised border border-line-subtle flex items-center justify-center shadow-sm">
+            <Crown className="h-5 w-5 text-ink-primary" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold tracking-tight text-white">{t('proModal', 'title')}</h2>
-              <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <h2 className="text-base font-bold tracking-tight text-ink-primary">{t('proModal', 'title')}</h2>
+              <span className="badge-mono text-[10px]">
                 Patreon Edition
               </span>
             </div>
-            <p className="text-xs text-slate-400">{t('proModal', 'subtitle')}</p>
+            <p className="text-xs text-ink-secondary">{t('proModal', 'subtitle')}</p>
           </div>
         </div>
 
         {/* IF ALREADY PRO */}
         {isPro ? (
           <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm flex items-start gap-3">
-              <ShieldCheck className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-card bg-[#141f17] border border-[#107C41]/30 text-xbox-light text-xs flex items-start gap-3">
+              <ShieldCheck className="h-4 w-4 text-xbox-light shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-emerald-200">OptimaAI PRO Active</p>
-                <p className="text-xs text-emerald-400/80 mt-1">
-                  {t('proModal', 'activeHolder')} <span className="font-bold text-white">{licenseStatus.holder}</span> ({licenseStatus.tier?.toUpperCase()})
+                <p className="font-bold text-white">OptimaAI PRO Active</p>
+                <p className="text-xs text-ink-secondary mt-0.5">
+                  {t('proModal', 'activeHolder')} <span className="font-bold text-ink-primary">{licenseStatus.holder}</span> ({licenseStatus.tier?.toUpperCase()})
                 </p>
                 {licenseStatus.activated_at && (
-                  <p className="text-[11px] text-slate-400 mt-0.5">{licenseStatus.activated_at}</p>
+                  <p className="text-[10px] text-ink-secondary mt-0.5">{licenseStatus.activated_at}</p>
                 )}
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-xs text-slate-300 space-y-1.5">
-              <p className="font-medium text-slate-200">{t('proModal', 'lifetimeTitle')}:</p>
-              <div className="flex items-center gap-2 text-slate-400">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+            <div className="p-3 rounded-card bg-surface-ground border border-line-subtle text-xs text-ink-secondary space-y-1.5">
+              <p className="font-semibold text-ink-primary">{t('proModal', 'lifetimeTitle')}:</p>
+              <div className="flex items-center gap-2 text-ink-secondary">
+                <CheckCircle2 className="h-3.5 w-3.5 text-xbox-light" />
                 <span>{t('proModal', 'perk1Title')}</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-400">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+              <div className="flex items-center gap-2 text-ink-secondary">
+                <CheckCircle2 className="h-3.5 w-3.5 text-xbox-light" />
                 <span>{t('proModal', 'perk2Title')}</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-400">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+              <div className="flex items-center gap-2 text-ink-secondary">
+                <CheckCircle2 className="h-3.5 w-3.5 text-xbox-light" />
                 <span>{t('proModal', 'perk3Title')}</span>
               </div>
             </div>
 
-            <div className="pt-2 flex justify-end gap-3">
+            <div className="pt-2 flex justify-end gap-2.5">
               <button
                 onClick={handleDeactivate}
                 disabled={loading}
-                className="px-3.5 py-2 text-xs font-medium rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 transition-colors"
+                className="px-3 py-1.5 text-xs font-medium rounded-btn text-[#ef4444] hover:bg-[#261416] border border-[#ef4444]/30 transition-colors"
               >
                 {t('proModal', 'deactivateBtn')}
               </button>
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition-colors"
+                className="btn-xbox-primary px-4 py-1.5 text-xs font-bold"
               >
                 {t('common', 'close')}
               </button>
@@ -151,31 +146,31 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
             
             {/* Features Highlight */}
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>{t('proModal', 'perk1Title')}</span>
+              <div className="p-2.5 rounded-card bg-surface-ground border border-line-subtle flex items-center gap-2">
+                <Sparkles className="h-3.5 w-3.5 text-xbox-light shrink-0" />
+                <span className="text-ink-secondary">{t('proModal', 'perk1Title')}</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-cyan-400 shrink-0" />
-                <span>{t('proModal', 'perk2Title')}</span>
+              <div className="p-2.5 rounded-card bg-surface-ground border border-line-subtle flex items-center gap-2">
+                <ShieldCheck className="h-3.5 w-3.5 text-ink-primary shrink-0" />
+                <span className="text-ink-secondary">{t('proModal', 'perk2Title')}</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
-                <Key className="h-4 w-4 text-purple-400 shrink-0" />
-                <span>{t('proModal', 'perk3Title')}</span>
+              <div className="p-2.5 rounded-card bg-surface-ground border border-line-subtle flex items-center gap-2">
+                <Key className="h-3.5 w-3.5 text-ink-primary shrink-0" />
+                <span className="text-ink-secondary">{t('proModal', 'perk3Title')}</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-slate-800/60 border border-slate-700/50 flex items-center gap-2">
-                <Crown className="h-4 w-4 text-yellow-400 shrink-0" />
-                <span>{t('proModal', 'perk4Title')}</span>
+              <div className="p-2.5 rounded-card bg-surface-ground border border-line-subtle flex items-center gap-2">
+                <Crown className="h-3.5 w-3.5 text-xbox-light shrink-0" />
+                <span className="text-ink-secondary">{t('proModal', 'perk4Title')}</span>
               </div>
             </div>
 
             {/* Patreon Callout */}
-            <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-indigo-500/10 border border-amber-500/20 flex items-center justify-between gap-3">
+            <div className="p-3 rounded-card bg-surface-ground border border-line-subtle flex items-center justify-between gap-3">
               <div className="text-xs">
-                <p className="font-semibold text-amber-300 flex items-center gap-1.5">
-                  <Heart className="h-3.5 w-3.5 text-rose-400 fill-rose-400" /> {t('proModal', 'patreonLink')}
+                <p className="font-semibold text-ink-primary flex items-center gap-1.5">
+                  <Heart className="h-3.5 w-3.5 text-[#ef4444] fill-[#ef4444]" /> {t('proModal', 'patreonLink')}
                 </p>
-                <p className="text-slate-400 text-[11px] mt-0.5">
+                <p className="text-ink-secondary text-[11px] mt-0.5">
                   {t('proModal', 'perk4Desc')}
                 </p>
               </div>
@@ -183,7 +178,7 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
                 href="https://patreon.com/Reselec"
                 target="_blank"
                 rel="noreferrer"
-                className="shrink-0 px-3 py-1.5 rounded-lg bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white font-semibold text-xs flex items-center gap-1 shadow-md shadow-rose-500/20 transition-all"
+                className="btn-dark-subtle shrink-0 px-3 py-1.5 rounded-btn text-xs font-semibold flex items-center gap-1.5"
               >
                 <span>Patreon</span>
                 <ExternalLink className="h-3 w-3" />
@@ -193,52 +188,52 @@ export default function ProActivationModal({ isOpen, onClose, licenseStatus, onA
             {/* Key Input Form */}
             <form onSubmit={handleActivate} className="space-y-3 pt-1">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center gap-1.5">
-                  <Key className="h-3.5 w-3.5 text-amber-400" /> {t('proModal', 'enterKeyPrompt')}
+                <label className="block text-xs font-medium text-ink-secondary mb-1.5 flex items-center gap-1.5">
+                  <Key className="h-3.5 w-3.5 text-xbox-light" /> {t('proModal', 'enterKeyPrompt')}
                 </label>
                 <input
                   type="text"
                   value={inputKey}
                   onChange={(e) => setInputKey(e.target.value.toUpperCase())}
                   placeholder={t('proModal', 'keyPlaceholder')}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm font-mono tracking-wider text-amber-200 placeholder:text-slate-600 transition-colors"
+                  className="w-full px-3.5 py-2 rounded-card bg-surface-ground border border-line-divider focus:border-xbox-core focus:outline-none focus:ring-1 focus:ring-xbox-core text-xs font-mono tracking-wider text-ink-primary placeholder:text-ink-secondary/60 transition-colors"
                 />
               </div>
 
               {/* Error Alert */}
               {errorMsg && (
-                <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
+                <div className="p-2.5 rounded-card bg-[#261416] border border-[#ef4444]/30 text-[#ef4444] text-xs flex items-center gap-2">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
               )}
 
               {/* Success Alert */}
               {successMsg && (
-                <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                <div className="p-2.5 rounded-card bg-[#141f17] border border-[#107C41]/30 text-xbox-light text-xs flex items-center gap-2">
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                   <span>{successMsg}</span>
                 </div>
               )}
 
               {/* Submit Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex items-center justify-end gap-2.5 pt-2">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                  className="btn-dark-subtle px-3.5 py-1.5 text-xs font-medium"
                 >
                   {t('common', 'cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 disabled:opacity-50"
+                  className="btn-xbox-primary px-4 py-1.5 text-xs font-bold flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {loading ? (
                     <span className="animate-spin">⏳</span>
                   ) : (
-                    <Sparkles className="h-3.5 w-3.5" />
+                    <Sparkles className="h-3 w-3" />
                   )}
                   <span>{loading ? t('proModal', 'activating') : t('proModal', 'activateBtn')}</span>
                 </button>

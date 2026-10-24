@@ -19,44 +19,46 @@ export default function Header({
   const { lang, toggleLanguage, t } = useLanguage();
 
   return (
-    <header className="glass-panel-header px-6 py-4 sticky top-0 z-40">
+    <header className="glass-panel-header px-6 py-3.5 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Cpu className="h-5 w-5 text-white" />
+          <div className="h-9 w-9 rounded-md bg-[#18181c] border border-[#2d2d34] flex items-center justify-center shadow-sm">
+            <Cpu className="h-4.5 w-4.5 text-[#10d05c]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-white">
-                {t('header', 'title')}<span className="text-indigo-400">{t('header', 'aiSuffix')}</span>
+              <h1 className="text-lg font-bold tracking-tight text-[#f3f4f6]">
+                {t('header', 'title')}<span className="text-[#10d05c]">{t('header', 'aiSuffix')}</span>
               </h1>
               {ollamaStatus?.is_running ? (
-                <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" /> {t('header', 'localAIActive')}
+                <span className="badge-mono px-2 py-0.5 text-[11px] flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#10d05c] shadow-[0_0_8px_#10d05c]" />
+                  <span>{t('header', 'localAIActive')}</span>
                 </span>
               ) : (
-                <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  ⚡ {t('header', 'heuristicMode')}
+                <span className="badge-mono px-2 py-0.5 text-[11px] text-[#9ca3af] flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#9ca3af]" />
+                  <span>{t('header', 'heuristicMode')}</span>
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400">{t('header', 'subtitle')}</p>
+            <p className="text-[11px] text-[#9ca3af] -mt-0.5">{t('header', 'subtitle')}</p>
           </div>
         </div>
 
         {/* Status Indicators & Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           
           {/* New Version Badge (if available) */}
           {updateInfo?.has_update && (
             <button
               onClick={onOpenUpdateModal}
-              title={`Nueva versión v${updateInfo.latest_version} disponible. Haz clic para actualizar.`}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-500/25 animate-pulse transition-all hover:scale-105"
+              title={`Nueva versión v${updateInfo.latest_version} disponible.`}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-[#1f1f24] hover:bg-[#26262c] text-[#13de64] border border-[#107C41]/50 shadow-[0_0_10px_-2px_rgba(16,208,92,0.3)] transition-all"
             >
-              <ArrowUpCircle className="h-3.5 w-3.5 text-cyan-200" />
+              <ArrowUpCircle className="h-3.5 w-3.5 text-[#10d05c]" />
               <span>{t('header', 'updateAvailable')} v{updateInfo.latest_version}</span>
             </button>
           )}
@@ -65,24 +67,23 @@ export default function Header({
           <button
             onClick={toggleLanguage}
             title={t('header', 'langSwitch')}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/60 text-xs font-bold transition-all hover:border-slate-500"
+            className="btn-dark-subtle flex items-center gap-1.5 px-2.5 py-1 text-xs"
           >
-            <Globe className="h-3.5 w-3.5 text-indigo-400" />
-            <span>{lang === 'es' ? '🇪🇸 ES' : '🇬🇧 EN'}</span>
+            <Globe className="h-3.5 w-3.5 text-[#9ca3af]" />
+            <span>{lang === 'es' ? 'ES' : 'EN'}</span>
           </button>
 
           {/* Model Selector */}
-          <div className="hidden sm:flex items-center gap-2 bg-slate-900/80 border border-slate-700/60 rounded-lg px-3 py-1.5 text-xs">
-            <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
-            <span className="text-slate-400">{t('header', 'ollamaModel')}</span>
+          <div className="hidden sm:flex items-center gap-2 bg-[#18181c] border border-[#26262b] rounded-md px-2.5 py-1 text-xs hover:border-[#3b3b45] transition-colors">
+            <span className="text-[#9ca3af] font-medium">{t('header', 'ollamaModel')}:</span>
             <select
               value={activeModel}
               onChange={(e) => onSelectModel(e.target.value)}
-              className="bg-transparent text-slate-200 font-medium focus:outline-none cursor-pointer"
+              className="bg-transparent text-[#f3f4f6] font-semibold focus:outline-none cursor-pointer text-xs"
             >
               {models && models.length > 0 ? (
                 models.map((m) => (
-                  <option key={m} value={m} className="bg-slate-900 text-slate-200">
+                  <option key={m} value={m} className="bg-[#18181c] text-[#f3f4f6]">
                     {m}
                   </option>
                 ))
@@ -94,15 +95,15 @@ export default function Header({
 
           {/* Privilege Badge */}
           {systemStatus?.is_elevated ? (
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-              <Shield className="h-3.5 w-3.5" />
+            <div className="badge-mono flex items-center gap-1.5 px-2.5 py-1 text-xs">
+              <Shield className="h-3.5 w-3.5 text-[#10d05c]" />
               <span>{t('header', 'adminElevated')}</span>
             </div>
           ) : (
             <button
               onClick={onRelaunchAdmin}
               title={t('header', 'standardUser')}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition-colors"
+              className="btn-dark-subtle flex items-center gap-1.5 px-2.5 py-1 text-xs border-amber-500/30 text-amber-400 hover:border-amber-500/50"
             >
               <ShieldAlert className="h-3.5 w-3.5" />
               <span>{t('header', 'standardUser')}</span>
@@ -114,18 +115,18 @@ export default function Header({
             <button
               onClick={onOpenProModal}
               title={`OptimaAI Pro - ${licenseStatus.holder} (${licenseStatus.tier?.toUpperCase()})`}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500/20 via-yellow-400/20 to-purple-500/20 text-amber-300 border border-amber-400/40 shadow-sm shadow-amber-500/10 hover:border-amber-300 hover:scale-105 transition-all"
+              className="badge-mono hover:bg-[#26262c] hover:border-[#3b3b45] flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold text-[#f3f4f6] transition-all cursor-pointer"
             >
-              <Crown className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400/20" />
-              <span>PRO ({licenseStatus.holder})</span>
+              <Crown className="h-3.5 w-3.5 text-[#d1d5db]" />
+              <span>PRO • {licenseStatus.holder}</span>
             </button>
           ) : (
             <button
               onClick={onOpenProModal}
               title={t('header', 'activatePro')}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 shadow-md shadow-amber-500/20 hover:scale-105 transition-all"
+              className="btn-xbox-primary flex items-center gap-1.5 px-3 py-1 text-xs"
             >
-              <Crown className="h-3.5 w-3.5 text-slate-950 fill-slate-950/20" />
+              <Crown className="h-3.5 w-3.5 text-white" />
               <span>{t('header', 'activatePro')}</span>
             </button>
           )}
@@ -134,10 +135,10 @@ export default function Header({
           <button
             onClick={onRefresh}
             disabled={refreshing}
-            className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-all border border-slate-700/50"
+            className="btn-dark-subtle p-1.5 flex items-center justify-center"
             title={t('header', 'refreshTooltip')}
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3.5 w-3.5 text-[#9ca3af] ${refreshing ? 'animate-spin text-white' : ''}`} />
           </button>
         </div>
 

@@ -393,7 +393,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#0e0e10] text-[#f3f4f6] flex flex-col">
       
       {/* Top Navbar */}
       <Header
@@ -419,22 +419,22 @@ export default function App() {
       />
 
       {/* Main Content Dashboard */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-5 space-y-4">
         
         {/* Toast Notification */}
         {toastMessage && (
-          <div className={`p-4 rounded-xl border flex items-center justify-between text-sm transition-all animate-bounce ${
+          <div className={`p-3.5 rounded-lg border flex items-center justify-between text-xs transition-all shadow-md ${
             toastMessage.type === 'error'
-              ? 'bg-rose-950/40 border-rose-500/40 text-rose-300'
+              ? 'bg-[#18181c] border-[#ef4444]/40 text-[#ef4444]'
               : toastMessage.type === 'success'
-              ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
-              : 'bg-indigo-950/40 border-indigo-500/40 text-indigo-300'
+              ? 'bg-[#18181c] border-[#107C41]/50 text-[#10d05c]'
+              : 'bg-[#18181c] border-[#26262b] text-[#d1d5db]'
           }`}>
-            <div className="flex items-center gap-2">
-              {toastMessage.type === 'error' ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+            <div className="flex items-center gap-2 font-medium">
+              {toastMessage.type === 'error' ? <AlertCircle className="h-4 w-4 text-[#ef4444]" /> : <CheckCircle2 className="h-4 w-4 text-[#10d05c]" />}
               <span>{toastMessage.msg}</span>
             </div>
-            <button onClick={() => setToastMessage(null)} className="text-xs opacity-75 hover:opacity-100">✕</button>
+            <button onClick={() => setToastMessage(null)} className="text-xs opacity-60 hover:opacity-100 text-[#9ca3af]">✕</button>
           </div>
         )}
 
@@ -460,26 +460,26 @@ export default function App() {
         />
 
         {/* Primary Action Controls Bar */}
-        <div className="glass-panel rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="glass-panel p-4 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-sm font-bold text-[#f3f4f6] flex items-center gap-2">
               <span>{t('diagnostic', 'title')}</span>
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="h-2 w-2 rounded-full bg-[#10d05c] shadow-[0_0_8px_#10d05c]" />
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[#9ca3af] mt-0.5">
               {t('diagnostic', 'subtitle')}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             {/* Quick Memory Sweep CTA */}
             <button
               onClick={handleQuickTrimRam}
               disabled={trimmingRam || boostingGame || scanning || diagnosing}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 hover:border-cyan-500/50 shadow-md transition-all disabled:opacity-50"
+              className="btn-dark-subtle flex items-center gap-2 px-3.5 py-2 text-xs"
               title={t('dashboard', 'quickTrimHelp')}
             >
-              <Zap className={`h-4 w-4 ${trimmingRam ? 'animate-spin' : ''}`} />
+              <Zap className={`h-3.5 w-3.5 text-[#10d05c] ${trimmingRam ? 'animate-spin' : ''}`} />
               <span>{trimmingRam ? t('dashboard', 'trimming') : t('dashboard', 'quickTrimBtn')}</span>
             </button>
 
@@ -487,10 +487,10 @@ export default function App() {
             <button
               onClick={handleGameBoost}
               disabled={boostingGame || trimmingRam || scanning || diagnosing}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-700 via-indigo-600 to-amber-500 hover:from-purple-600 hover:to-amber-400 text-white shadow-lg shadow-purple-900/30 transition-all disabled:opacity-50"
+              className="btn-xbox-primary flex items-center gap-2 px-4 py-2 text-xs"
               title={t('dashboard', 'gameBoostHelp')}
             >
-              <Rocket className={`h-4 w-4 ${boostingGame ? 'animate-spin' : ''}`} />
+              <Rocket className={`h-3.5 w-3.5 text-white ${boostingGame ? 'animate-spin' : ''}`} />
               <span>{boostingGame ? t('dashboard', 'boosting') : t('dashboard', 'gameBoostBtn')}</span>
             </button>
 
@@ -498,9 +498,9 @@ export default function App() {
             <button
               onClick={handleStartDeepExam}
               disabled={scanning || diagnosing}
-              className="flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-xl shadow-indigo-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="bg-[#1f1f24] hover:bg-[#26262c] text-[#f3f4f6] border border-[#2d2d34] hover:border-[#107C41] flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed group cursor-pointer"
             >
-              <Play className={`h-4 w-4 fill-current ${scanning || diagnosing ? 'animate-spin' : 'group-hover:scale-110 transition-transform'}`} />
+              <Play className={`h-3.5 w-3.5 text-[#10d05c] fill-current ${scanning || diagnosing ? 'animate-spin' : 'group-hover:scale-110 transition-transform'}`} />
               <span>{scanning ? t('dashboard', 'scanning') : diagnosing ? t('dashboard', 'analyzing') : t('dashboard', 'startExamBtn')}</span>
             </button>
           </div>
@@ -538,7 +538,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/60 py-4 px-6 text-center text-xs text-slate-400">
+      <footer className="border-t border-[#26262b] py-4 px-6 text-center text-xs text-[#9ca3af]">
         {t('dashboard', 'footer')}
       </footer>
 
